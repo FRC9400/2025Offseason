@@ -14,24 +14,18 @@ public class canIDConstants {
     public static final int[] CANcoder = {9, 10, 11, 12};
 
     /* End Effector */
-    public static final int endEffectorMotor = 13;
-
-    /* Funnel */
-    public static final int funnelMotor = 14;
-
-    /* Dealgae */
-    public static final int dealgaeMotor = 15;
+    public static final int algaeMotor = 13;
+    public static final int coralMotor = 14;
+    public static final int pivotMotor = 15;
 
     /* Elevator */
     public static final int leftElevatorMotor = 16;
     public static final int rightElevatorMotor = 17;
 
-    /* Intake */
-    public static final int pivotMotor = 18;
-    public static final int rollerMotor = 19;
-
-
-    /* LEDs */
-    public static final int CANdle = 20;
+    /* Pivot */
+    public static final int leftPivotMotor1 = 18;
+    public static final int leftPivotMotor2 = 19;
+    public static final int rightPivotMotor1 = 20;
+    public static final int rightPivotMotor2 = 21;
 
 }
