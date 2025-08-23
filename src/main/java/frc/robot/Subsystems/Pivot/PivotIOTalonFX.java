@@ -109,7 +109,7 @@ public class PivotIOTalonFX implements PivotIO {
         followerWithInverse = new Follower(leftMotor1.getDeviceID(), true);
 
         /* Control Requests */
-        motionMagicRequest = new MotionMagicVoltage(0)..withSlot(0).withEnableFOC(true);
+        motionMagicRequest = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(true);
         voltageOutRequest = new VoltageOut(0).withEnableFOC(true);
 
         /* Doubles */
