@@ -54,13 +54,13 @@ public class PivotIOTalonFX implements PivotIO {
     private final StatusSignal<Voltage> rightPivot2Voltage;
 
     private final StatusSignal<Angle> leftPivot1Position;
-    private final StautsSignal<Angle> leftPivot2Position;
+    private final StatusSignal<Angle> leftPivot2Position;
     private final StatusSignal<Angle> rightPivot1Position;
     private final StatusSignal<Angle> rightPivot2Position;
 
     /* Follower */
     private final Follower followerWithoutInverse;
-    private final Folllower followerWithInverse;
+    private final Follower followerWithInverse;
 
     /* Control Requests */
     private MotionMagicVoltage motionMagicRequest;
@@ -209,7 +209,7 @@ public class PivotIOTalonFX implements PivotIO {
         );
 
         /* Refresh Inputs */        
-        inputs.appliedPosition = motionMagicRequest.Output;
+        inputs.appliedPosition = motionMagicRequest.Position;
         inputs.appliedVolts = voltageOutRequest.Output;
 
         inputs.setpointVolts = setpointVolts;
@@ -221,7 +221,7 @@ public class PivotIOTalonFX implements PivotIO {
         inputs.voltage = new double[] {leftPivot1Voltage.getValueAsDouble(), leftPivot1Voltage.getValueAsDouble(), rightPivot1Voltage.getValueAsDouble(), rightPivot2Voltage.getValueAsDouble()};
         inputs.currentAmps = new double[] {leftPivot1Current.getValueAsDouble(), leftPivot2Current.getValueAsDouble(), rightPivot1Current.getValueAsDouble(), rightPivot2Current.getValueAsDouble()};
         inputs.tempFahrenheit = new double[] {leftPivot1Temp.getValueAsDouble(), leftPivot2Temp.getValueAsDouble(), rightPivot1Temp.getValueAsDouble(), rightPivot2Temp.getValueAsDouble()};
-        inputs.velocityRPS = new double[] {leftPivot1AngularVelocity.getValueAsDouble(), leftPivot2AngularVelocity.getValueAsDouble(), rightPivot1AngularVelocity.getValueAsDouble(), rightPivot2AngularVelocity.getValueAsDouble()}
+        inputs.velocityRPS = new double[] {leftPivot1AngularVelocity.getValueAsDouble(), leftPivot2AngularVelocity.getValueAsDouble(), rightPivot1AngularVelocity.getValueAsDouble(), rightPivot2AngularVelocity.getValueAsDouble()};
     }
 
     public void requestVoltage(double volts){
@@ -231,7 +231,7 @@ public class PivotIOTalonFX implements PivotIO {
 
     public void requestMotionMagic(double deg){
         setpointDeg = deg;
-        leftMotor1.setControl(Conversions.DegreesToRotations(deg, pivotConstants.gearRatio));
+        leftMotor1.setControl(motionMagicRequest.withPosition(Conversions.DegreesToRotations(deg, pivotConstants.gearRatio)));
     }
 
 }
