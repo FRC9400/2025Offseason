@@ -7,46 +7,44 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import frc.commons.Conversions;
+import frc.commons.LoggedTunableNumber;
 import frc.robot.Constants.canIDConstants;
 import frc.robot.Constants.elevatorConstants;
 
 public class ElevatorIOTalonFX implements ElevatorIO{
     TalonFX leftMotor = new TalonFX(canIDConstants.leftElevatorMotor, "rio");
     TalonFX rightMotor = new TalonFX(canIDConstants.rightElevatorMotor, "rio");
-    TalonFXConfiguration leftConfig = new TalonFXConfiguration();
-    TalonFXConfiguration rightConfig = new TalonFXConfiguration();
+    TalonFXConfiguration config = new TalonFXConfiguration();
 
     private MotionMagicVoltage motionMagicVolts = new MotionMagicVoltage(0).withEnableFOC(true);
     private VoltageOut voltageReq = new VoltageOut(0).withEnableFOC(true);
     private double setpoint = 0;
 
+    LoggedTunableNumber kGTunable = new LoggedTunableNumber("Elevator/kG", 0.5);
+    LoggedTunableNumber kCTunable = new LoggedTunableNumber("Elevator/kC", -0.18);
+
     public double kG = 0.5;//placeholder values
     public double kC = -0.18;
 
     public ElevatorIOTalonFX() {
-        leftConfig.MotionMagic.MotionMagicCruiseVelocity = elevatorConstants.CruiseVelocity;
-        leftConfig.MotionMagic.MotionMagicAcceleration = elevatorConstants.Acceleration;
-        leftConfig.MotionMagic.MotionMagicJerk = elevatorConstants.Jerk;
+        config.MotionMagic.MotionMagicCruiseVelocity = elevatorConstants.CruiseVelocity;
+        config.MotionMagic.MotionMagicAcceleration = elevatorConstants.Acceleration;
+        config.MotionMagic.MotionMagicJerk = elevatorConstants.Jerk;
 
-        leftConfig.Slot0.kP = 1;//placeholders
-        leftConfig.Slot0.kI = 0;
-        leftConfig.Slot0.kD = 0.01;
-        leftConfig.Slot0.kS = 0.09;
-        leftConfig.Slot0.kV = 0;
-        leftConfig.Slot0.kA = 0;
+        config.Slot0.kP = 1;//placeholders
+        config.Slot0.kI = 0;
+        config.Slot0.kD = 0.01;
+        config.Slot0.kS = 0.09;
+        config.Slot0.kV = 0;
+        config.Slot0.kA = 0;
 
-        leftConfig.CurrentLimits.StatorCurrentLimit = elevatorConstants.statorCurrentLimit;
-        leftConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        rightConfig.CurrentLimits.StatorCurrentLimit = elevatorConstants.statorCurrentLimit;
-        rightConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+        config.CurrentLimits.StatorCurrentLimit = elevatorConstants.statorCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = true;
 
-        leftConfig.MotorOutput.NeutralMode = elevatorConstants.elevatorNeutralMode;
-        leftConfig.MotorOutput.Inverted = elevatorConstants.elevatorMotorInvert;
-        rightConfig.MotorOutput.NeutralMode = elevatorConstants.elevatorNeutralMode;
-        rightConfig.MotorOutput.Inverted = elevatorConstants.elevatorMotorInvert;
+        config.MotorOutput.NeutralMode = elevatorConstants.elevatorNeutralMode;
+        config.MotorOutput.Inverted = elevatorConstants.elevatorMotorInvert;
 
-        leftMotor.getConfigurator().apply(leftConfig);
-        rightMotor.getConfigurator().apply(rightConfig);
+        leftMotor.getConfigurator().apply(config);
         rightMotor.setControl(new Follower(canIDConstants.leftElevatorMotor, false));
         
         leftMotor.optimizeBusUtilization();
@@ -64,6 +62,8 @@ public class ElevatorIOTalonFX implements ElevatorIO{
     }
 
     public void requestPosition(double meters, double radians){
+        kG = kGTunable.getAsDouble();
+        kC = kCTunable.getAsDouble();
         setpoint = meters;
         leftMotor.setControl(motionMagicVolts.withPosition(meters/elevatorConstants.wheelCircumferenceMeters).withFeedForward(kG*Math.sin(radians)+kC));//placeholder value
     }
