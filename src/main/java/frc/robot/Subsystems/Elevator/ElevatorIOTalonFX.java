@@ -22,6 +22,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
 
     LoggedTunableNumber kGTunable = new LoggedTunableNumber("Elevator/kG", 0.5);
     LoggedTunableNumber kCTunable = new LoggedTunableNumber("Elevator/kC", -0.18);
+    LoggedTunableNumber angle = new LoggedTunableNumber("Elevator/Angle", 0);
 
     public double kG = 0.5;//placeholder values
     public double kC = -0.18;
@@ -65,7 +66,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         kG = kGTunable.getAsDouble();
         kC = kCTunable.getAsDouble();
         setpoint = meters;
-        leftMotor.setControl(motionMagicVolts.withPosition(meters/elevatorConstants.wheelCircumferenceMeters).withFeedForward(kG*Math.sin(radians)+kC));//placeholder value
+        leftMotor.setControl(motionMagicVolts.withPosition(meters/elevatorConstants.wheelCircumferenceMeters).withFeedForward(kG*Math.sin(angle.getAsDouble())+kC));//placeholder value
     }
 
     public void requestVoltage(double volts){
