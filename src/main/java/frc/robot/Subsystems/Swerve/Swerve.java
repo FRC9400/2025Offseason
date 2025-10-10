@@ -131,7 +131,7 @@ public class Swerve extends SubsystemBase{
             Logger.processInputs("Swerve/Module/ModuleNum[" + i + "]", moduleInputs[i]);
         }
         
-        updateOdometry();
+        //updateOdometry();
         logModuleStates("SwerveModuleStates/setpointStates", getSetpointStates());
         //logModuleStates("SwerveModuleStates/optimizedSetpointStates", getOptimizedSetPointStates());
         logModuleStates("SwerveModuleStates/MeasuredStates", getMeasuredStates());
