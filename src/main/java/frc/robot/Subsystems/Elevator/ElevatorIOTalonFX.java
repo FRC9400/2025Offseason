@@ -12,8 +12,8 @@ import frc.robot.Constants.canIDConstants;
 import frc.robot.Constants.elevatorConstants;
 
 public class ElevatorIOTalonFX implements ElevatorIO{
-    TalonFX leftMotor = new TalonFX(canIDConstants.elevatorMotor1, "canivore");
-    TalonFX rightMotor = new TalonFX(canIDConstants.elevatorMotor2, "canivore");
+    TalonFX leftMotor = new TalonFX(canIDConstants.elevatorMotor1, "rio");
+    TalonFX rightMotor = new TalonFX(canIDConstants.elevatorMotor2, "rio");
     TalonFXConfiguration config = new TalonFXConfiguration();
 
     private MotionMagicVoltage motionMagicVolts = new MotionMagicVoltage(0).withEnableFOC(true);

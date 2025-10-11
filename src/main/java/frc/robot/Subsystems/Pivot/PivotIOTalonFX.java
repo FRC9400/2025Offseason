@@ -64,10 +64,10 @@ public class PivotIOTalonFX implements PivotIO {
 
     public PivotIOTalonFX(){
         /* Motor Objects */
-        leftMotor1 = new TalonFX(canIDConstants.leftPivotMotor1, "canivore");
-        leftMotor2 = new TalonFX(canIDConstants.leftPivotMotor2, "canivore");
-        rightMotor1 = new TalonFX(canIDConstants.rightPivotMotor1, "canivore");
-        rightMotor2 = new TalonFX(canIDConstants.rightPivotMotor2, "canivore");
+        leftMotor1 = new TalonFX(canIDConstants.leftPivotMotor1, "rio");
+        leftMotor2 = new TalonFX(canIDConstants.leftPivotMotor2, "rio");
+        rightMotor1 = new TalonFX(canIDConstants.rightPivotMotor1, "rio");
+        rightMotor2 = new TalonFX(canIDConstants.rightPivotMotor2, "rio");
         leftMotor1Configs = new TalonFXConfiguration();
 
         /* Status Signals */
