@@ -54,10 +54,6 @@ public class PivotIOTalonFX implements PivotIO {
     private final StatusSignal<Angle> rightPivot1Position;
     private final StatusSignal<Angle> rightPivot2Position;
 
-    /* Follower */
-    private final Follower followerWithoutInverse;
-    private final Follower followerWithInverse;
-
     /* Control Requests */
     private MotionMagicVoltage motionMagicRequest;
     private VoltageOut voltageOutRequest;
@@ -68,10 +64,10 @@ public class PivotIOTalonFX implements PivotIO {
 
     public PivotIOTalonFX(){
         /* Motor Objects */
-        leftMotor1 = new TalonFX(canIDConstants.leftPivotMotor1, "rio");
-        leftMotor2 = new TalonFX(canIDConstants.leftPivotMotor2, "rio");
-        rightMotor1 = new TalonFX(canIDConstants.rightPivotMotor1, "rio");
-        rightMotor2 = new TalonFX(canIDConstants.rightPivotMotor2, "rio");
+        leftMotor1 = new TalonFX(canIDConstants.leftPivotMotor1, "canivore");
+        leftMotor2 = new TalonFX(canIDConstants.leftPivotMotor2, "canivore");
+        rightMotor1 = new TalonFX(canIDConstants.rightPivotMotor1, "canivore");
+        rightMotor2 = new TalonFX(canIDConstants.rightPivotMotor2, "canivore");
         leftMotor1Configs = new TalonFXConfiguration();
 
         /* Status Signals */
@@ -99,10 +95,6 @@ public class PivotIOTalonFX implements PivotIO {
         leftPivot2Position = leftMotor2.getRotorPosition();
         rightPivot1Position = rightMotor1.getRotorPosition();
         rightPivot2Position = rightMotor2.getRotorPosition();
-
-        /* Follower */
-        followerWithoutInverse = new Follower(leftMotor1.getDeviceID(), false);
-        followerWithInverse = new Follower(leftMotor1.getDeviceID(), true);
 
         /* Control Requests */
         motionMagicRequest = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(true);
@@ -142,10 +134,10 @@ public class PivotIOTalonFX implements PivotIO {
         leftMotor1.setPosition(0);
 
         /* Configure Configs */
-        leftMotor2.setControl(followerWithoutInverse);
-        rightMotor1.setControl(followerWithInverse);
-        rightMotor2.setControl(followerWithInverse);
         leftMotor1.getConfigurator().apply(leftMotor1Configs);
+        leftMotor2.setControl(new Follower(leftMotor1.getDeviceID(), false));
+        rightMotor1.setControl(new Follower(leftMotor1.getDeviceID(), true));
+        rightMotor2.setControl(new Follower(leftMotor1.getDeviceID(), true));
 
         /* Set Frequency */
         BaseStatusSignal.setUpdateFrequencyForAll(

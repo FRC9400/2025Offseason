@@ -6,15 +6,17 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Subsystems.Pivot.Pivot;
+import frc.robot.Subsystems.Pivot.PivotIOTalonFX;
 import frc.robot.Subsystems.Swerve.Swerve;
 import frc.commons.LoggedTunableNumber;
 import frc.robot.Commands.TeleopSwerve;
 
 public class RobotContainer {
-    public static final CommandXboxController driver = new CommandXboxController(0);
-    public static final CommandXboxController operator = new CommandXboxController(1);
-    
+    public static final CommandXboxController driver = new CommandXboxController(0);    
+    private final Pivot pivot = new Pivot(new PivotIOTalonFX());
     private final Swerve swerve = new Swerve();
   
     public RobotContainer() {
@@ -35,6 +37,10 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+        driver.a().whileTrue(new RunCommand(() -> pivot.requestVoltage(-2)));
+        driver.b().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
+        driver.y().whileTrue(new RunCommand(() ->
+        pivot.requestVoltage(2)));
 
     }
 

@@ -203,7 +203,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     }
 
     public void resetToAbsolute() {
-        double absolutePositionRotations = angleEncoder.getAbsolutePosition().getValueAsDouble() - CANcoderOffset;
+        double absolutePositionRotations = angleEncoder.getAbsolutePosition().getValueAsDouble();
         double absolutePositionSteerRotations = absolutePositionRotations * moduleConstants.steerGearRatio;
         steerMotor.setPosition(absolutePositionSteerRotations);
     }

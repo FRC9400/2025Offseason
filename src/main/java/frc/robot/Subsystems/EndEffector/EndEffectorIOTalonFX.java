@@ -143,9 +143,9 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
         inputs.pivotAppliedVolts = pivotVoltageRequest.Output;
         inputs.pivotSetpointVolts = pivotSetpointVolts;
         inputs.pivotSetpointDeg = pivotSetpointDeg;
-        inputs.pivotSetpointRot = Conversions.DegreesToRotations(pivotSetpointDeg, endEffectorConstants.gearRatio);
+        inputs.pivotSetpointRot = Conversions.DegreesToRotations(pivotSetpointDeg, endEffectorConstants.pivotGearRatio);
         inputs.pivotPosRot = pivotPos.getValueAsDouble();
-        inputs.pivotPosDeg = Conversions.RotationsToDegrees(pivotPos.getValueAsDouble(), endEffectorConstants.gearRatio); 
+        inputs.pivotPosDeg = Conversions.RotationsToDegrees(pivotPos.getValueAsDouble(), endEffectorConstants.pivotGearRatio); 
         inputs.pivotCurrent = algaeCurrent.getValueAsDouble();
         inputs.pivotRPS = algaeRPS.getValueAsDouble();
         inputs.pivotTemp = algaeTemp.getValueAsDouble();
@@ -169,7 +169,7 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
 
     public void setPivotMotionMagic(double degrees){
         this.pivotSetpointDeg = degrees;
-        pivotSetpointRot = Conversions.DegreesToRotations(degrees, endEffectorConstants.gearRatio);
+        pivotSetpointRot = Conversions.DegreesToRotations(degrees, endEffectorConstants.pivotGearRatio);
         pivot.setControl(pivotMotionMagicRequest.withPosition(pivotSetpointRot));
     }
 
