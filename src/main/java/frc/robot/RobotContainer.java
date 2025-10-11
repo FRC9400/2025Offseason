@@ -8,46 +8,53 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Subsystems.Elevator.Elevator;
+import frc.robot.Subsystems.Elevator.ElevatorIOTalonFX;
+import frc.robot.Subsystems.EndEffector.EndEffector;
+import frc.robot.Subsystems.EndEffector.EndEffectorIOTalonFX;
 import frc.robot.Subsystems.Pivot.Pivot;
 import frc.robot.Subsystems.Pivot.PivotIOTalonFX;
 import frc.robot.Subsystems.Swerve.Swerve;
 import frc.commons.LoggedTunableNumber;
 import frc.robot.Commands.TeleopSwerve;
+import frc.robot.Constants.elevatorConstants;
 
 public class RobotContainer {
     public static final CommandXboxController driver = new CommandXboxController(0);    
     private final Pivot pivot = new Pivot(new PivotIOTalonFX());
+    private final Elevator elevator = new Elevator(new ElevatorIOTalonFX());
     private final Swerve swerve = new Swerve();
+    private final EndEffector endEffector = new EndEffector(new EndEffectorIOTalonFX());
   
     public RobotContainer() {
-    swerve.zeroGyro();
-    swerve.zeroWheels();
-    swerve.setDefaultCommand(
-        new TeleopSwerve(
-            swerve, 
-            () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
-            () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value), 
-            () -> -driver.getRawAxis(XboxController.Axis.kRightX.value)
-          
-        )
-   
-    );
-    configureBindings();
+        swerve.zeroGyro();
+        swerve.zeroWheels();
+        swerve.setDefaultCommand(
+            new TeleopSwerve(
+                swerve, 
+                () -> -driver.getRawAxis(XboxController.Axis.kLeftY.value),
+                () -> -driver.getRawAxis(XboxController.Axis.kLeftX.value), 
+                () -> -driver.getRawAxis(XboxController.Axis.kRightX.value)
+            
+            )
+        );
 
+        configureBindings();
     }
 
     private void configureBindings() {
-        driver.a().whileTrue(new RunCommand(() -> pivot.requestVoltage(-2)));
-        driver.b().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
-        driver.y().whileTrue(new RunCommand(() ->
-        pivot.requestVoltage(2)));
+        driver.a().whileTrue(new RunCommand(() -> swerve.zeroWheels()));
+        driver.b().whileTrue(new RunCommand(() -> endEffector.setPivotVoltage(0)));
+        driver.x().whileTrue(new RunCommand(() -> endEffector.setPivotVoltage(1)));
+        driver.y().whileTrue(new RunCommand(() -> endEffector.setPivotVoltage(-1)));
+        driver.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
+        driver.rightBumper().whileTrue(new RunCommand(() -> endEffector.setCoralVoltage(1)));
+        driver.rightTrigger().whileTrue(new RunCommand(() -> endEffector.setCoralVoltage(0)));
 
     }
 
     public Swerve getSwerve(){
         return swerve;
     }
-    
-    
 
 }

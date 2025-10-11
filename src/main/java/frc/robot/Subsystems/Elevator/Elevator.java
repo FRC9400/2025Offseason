@@ -59,6 +59,10 @@ public class Elevator extends SubsystemBase {
         elevatorIO.requestPosition(meters, radians);
     }
 
+    public void setVoltage(double volts){
+        elevatorIO.requestVoltage(volts);
+    }
+
     @Override
     public void periodic(){
         elevatorIO.updateInputs(inputs);
