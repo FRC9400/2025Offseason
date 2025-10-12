@@ -16,6 +16,6 @@ public class endEffectorConstants {
     /* Gear Ratios */
     public static final double algaeGearRatio = 6.111;
     public static final double coralGearRatio = 7.666;
-    public static final double pivotGearRatio = 10;
+    public static final double pivotGearRatio = 28.78571428;
 
 }

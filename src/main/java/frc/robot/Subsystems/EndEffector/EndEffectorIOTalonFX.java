@@ -73,6 +73,8 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
         coralConfigs.MotorOutput.Inverted = endEffectorConstants.coralMotorInvert;
         pivotConfigs.MotorOutput.Inverted = endEffectorConstants.pivotMotorInvert;
         
+        pivot.setPosition(0);
+
         // Apply Configs
         algaeMotor.getConfigurator().apply(algaeConfigs);
         coral.getConfigurator().apply(coralConfigs);
@@ -111,6 +113,8 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
         // Bus Utilization
         algaeMotor.optimizeBusUtilization();
         coral.optimizeBusUtilization();
+
+
     }
 
     // Input Update + Refresh
