@@ -34,8 +34,11 @@ public interface EndEffectorIO {
 
     public default void zeroPosition(){}
 
-    public default void setAlgaeVoltage(double voltage){}
-    public default void setCoralVoltage(double voltage){}
-    public default void setPivotVoltage(double voltage){}
-    public default void setPivotMotionMagic(double degrees){}
+    public default void requestAlgaeVoltage(double voltage){}
+
+    public default void requestCoralVoltage(double voltage){}
+
+    public default void requestPivotVoltage(double voltage){}
+
+    public default void requestPivotMotionMagic(double degrees){}
 }

@@ -152,22 +152,22 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
     }
 
     // Set Voltage + Position  
-    public void setAlgaeVoltage(double voltage){
+    public void requestAlgaeVoltage(double voltage){
         this.algaeSetpointVolts = voltage;
         algaeMotor.setControl(algaeVoltageRequest.withOutput(algaeSetpointVolts));
     }
 
-    public void setCoralVoltage(double voltage){
+    public void requestCoralVoltage(double voltage){
         this.coralSetpointVolts = voltage;
         coral.setControl(coralVoltageRequest.withOutput(coralSetpointVolts));
     }
 
-    public void setPivotVoltage(double voltage){
+    public void requestPivotVoltage(double voltage){
         this.pivotSetpointVolts = voltage;
         pivot.setControl(pivotVoltageRequest.withOutput(pivotSetpointVolts));
     }
 
-    public void setPivotMotionMagic(double degrees){
+    public void requestPivotMotionMagic(double degrees){
         this.pivotSetpointDeg = degrees;
         pivotSetpointRot = Conversions.DegreesToRotations(degrees, endEffectorConstants.pivotGearRatio);
         pivot.setControl(pivotMotionMagicRequest.withPosition(pivotSetpointRot));

@@ -44,12 +44,12 @@ public class RobotContainer {
 
     private void configureBindings() {
         driver.a().whileTrue(new RunCommand(() -> swerve.zeroWheels()));
-        driver.b().whileTrue(new RunCommand(() -> endEffector.setPivotVoltage(0)));
-        driver.x().whileTrue(new RunCommand(() -> endEffector.setPivotVoltage(1)));
-        driver.y().whileTrue(new RunCommand(() -> endEffector.setPivotVoltage(-1)));
+        driver.b().whileTrue(new RunCommand(() -> endEffector.requestPivotVoltage(0)));
+        driver.x().whileTrue(new RunCommand(() -> endEffector.requestPivotVoltage(1)));
+        driver.y().whileTrue(new RunCommand(() -> endEffector.requestPivotVoltage(-1)));
         driver.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
-        driver.rightBumper().whileTrue(new RunCommand(() -> endEffector.setCoralVoltage(1)));
-        driver.rightTrigger().whileTrue(new RunCommand(() -> endEffector.setCoralVoltage(0)));
+        driver.rightBumper().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(1)));
+        driver.rightTrigger().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(0)));
 
     }
 

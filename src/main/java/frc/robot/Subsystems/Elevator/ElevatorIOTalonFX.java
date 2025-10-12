@@ -1,31 +1,48 @@
 package frc.robot.Subsystems.Elevator;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import frc.commons.Conversions;
 import frc.commons.LoggedTunableNumber;
 import frc.robot.Constants.canIDConstants;
 import frc.robot.Constants.elevatorConstants;
 
 public class ElevatorIOTalonFX implements ElevatorIO{
+    /* Motor Objects */
     TalonFX leftMotor = new TalonFX(canIDConstants.elevatorMotor1, "rio");
     TalonFX rightMotor = new TalonFX(canIDConstants.elevatorMotor2, "rio");
     TalonFXConfiguration config = new TalonFXConfiguration();
 
-    private MotionMagicVoltage motionMagicVolts = new MotionMagicVoltage(0).withEnableFOC(true);
+    /* Control Requests */
+    private MotionMagicVoltage motionMagicRequest = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(true);
     private VoltageOut voltageReq = new VoltageOut(0).withEnableFOC(true);
-    private double setpoint = 0;
+    
+    /* Doubles */
+    private double setpointMeters = 0;
+    private double setpointVolts = 0;
 
-    LoggedTunableNumber kGTunable = new LoggedTunableNumber("Elevator/kG", 0.5);
-    LoggedTunableNumber kCTunable = new LoggedTunableNumber("Elevator/kC", -0.18);
-    LoggedTunableNumber angle = new LoggedTunableNumber("Elevator/Angle", 0);
-
-    public double kG = 0.5;//placeholder values
-    public double kC = -0.18;
+    /* Status Signals */
+    private final StatusSignal<Current> leftElevatorCurrent = leftMotor.getStatorCurrent();
+    private final StatusSignal<Current> rightElevatorCurrent = rightMotor.getStatorCurrent();
+    private final StatusSignal<Temperature> leftElevatorTemp = leftMotor.getDeviceTemp();
+    private final StatusSignal<Temperature> rightElevatorTemp = rightMotor.getDeviceTemp();
+    private final StatusSignal<AngularVelocity> leftElevatorAngularVelocity = leftMotor.getRotorVelocity();
+    private final StatusSignal<AngularVelocity> rightElevatorAngularVelocity = rightMotor.getRotorVelocity();
+    private final StatusSignal<Voltage> leftVoltage = leftMotor.getMotorVoltage();
+    private final StatusSignal<Voltage> rightVoltage = rightMotor.getMotorVoltage();
+    private final StatusSignal<Angle> leftElevatorPos = leftMotor.getRotorPosition(); 
 
     public ElevatorIOTalonFX() {
         config.MotionMagic.MotionMagicCruiseVelocity = elevatorConstants.CruiseVelocity;
@@ -38,6 +55,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         config.Slot0.kS = 0.09;
         config.Slot0.kV = 0;
         config.Slot0.kA = 0;
+        config.Slot0.kG = 0;
 
         config.CurrentLimits.StatorCurrentLimit = elevatorConstants.statorCurrentLimit;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -45,31 +63,61 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         config.MotorOutput.NeutralMode = elevatorConstants.elevatorNeutralMode;
         config.MotorOutput.Inverted = elevatorConstants.elevatorMotorInvert;
 
+        leftMotor.setPosition(0);
+
         leftMotor.getConfigurator().apply(config);
         rightMotor.setControl(new Follower(canIDConstants.elevatorMotor1, false));
         
+        BaseStatusSignal.setUpdateFrequencyForAll(
+            50,
+            leftElevatorCurrent,
+            rightElevatorCurrent,
+            leftElevatorTemp,
+            rightElevatorTemp,
+            leftElevatorAngularVelocity,
+            rightElevatorAngularVelocity,
+            leftVoltage,
+            rightVoltage,
+            leftElevatorPos);
+
         leftMotor.optimizeBusUtilization();
         rightMotor.optimizeBusUtilization();
     }
 
     public void updateInputs(ElevatorIOInputs inputs){
+        /* Refresh Status Signals */
+        BaseStatusSignal.refreshAll(
+           leftElevatorCurrent,
+            rightElevatorCurrent,
+            leftElevatorTemp,
+            rightElevatorTemp,
+            leftElevatorAngularVelocity,
+            rightElevatorAngularVelocity,
+            leftVoltage,
+            rightVoltage,
+            leftElevatorPos 
+        );
+
+        inputs.voltage = new double[] {leftVoltage.getValueAsDouble(), rightVoltage.getValueAsDouble()};
         inputs.appliedVolts = voltageReq.Output;
-        inputs.setpointMeters = setpoint;
-        inputs.elevatorHeightMeters = Conversions.RotationsToMeters(leftMotor.getPosition().getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio);
-        inputs.velocityRPS = new double[] {leftMotor.getVelocity().getValueAsDouble(), rightMotor.getVelocity().getValueAsDouble()};
-        inputs.velocityMPS =  new double[] {Conversions.RPStoMPS(leftMotor.getVelocity().getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio), Conversions.RPStoMPS(rightMotor.getVelocity().getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio)};
-        inputs.currentAmps = new double[] {leftMotor.getStatorCurrent().getValueAsDouble(), rightMotor.getStatorCurrent().getValueAsDouble()};
-        inputs.tempFahrenheit = new double[] {leftMotor.getDeviceTemp().getValueAsDouble(), rightMotor.getDeviceTemp().getValueAsDouble()};
+        inputs.appliedMeters = motionMagicRequest.Position;
+        inputs.setpointVolts = setpointVolts;
+        inputs.setpointMeters = setpointMeters;
+        
+        inputs.elevatorHeightMeters = Conversions.RotationsToMeters(leftElevatorPos.getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio);
+        inputs.velocityRPS = new double[] {leftElevatorAngularVelocity.getValueAsDouble(), rightElevatorAngularVelocity.getValueAsDouble()};
+        inputs.velocityMPS =  new double[] {Conversions.RPStoMPS(leftElevatorAngularVelocity.getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio), Conversions.RPStoMPS(rightElevatorAngularVelocity.getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio)};
+        inputs.currentAmps = new double[] {leftElevatorCurrent.getValueAsDouble(), rightElevatorCurrent.getValueAsDouble()};
+        inputs.tempFahrenheit = new double[] {leftElevatorTemp.getValueAsDouble(), rightElevatorTemp.getValueAsDouble()};
     }
 
-    public void requestPosition(double meters, double radians){
-        kG = kGTunable.getAsDouble();
-        kC = kCTunable.getAsDouble();
-        setpoint = meters;
-        leftMotor.setControl(motionMagicVolts.withPosition(meters/elevatorConstants.wheelCircumferenceMeters).withFeedForward(kG*Math.sin(angle.getAsDouble())+kC));//placeholder value
+    public void requestMotionMagic(double meters){
+        setpointMeters = meters;
+        leftMotor.setControl(motionMagicRequest.withPosition(Conversions.metersToRotations(meters, elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio)));
     }
 
     public void requestVoltage(double volts){
+        setpointVolts = volts;
         leftMotor.setControl(voltageReq.withOutput(volts));
     }
 }

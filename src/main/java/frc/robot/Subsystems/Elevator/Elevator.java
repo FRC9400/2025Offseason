@@ -55,11 +55,11 @@ public class Elevator extends SubsystemBase {
             this.runOnce(() -> SignalLogger.stop()));
     }
 
-    public void setHeight(double meters, double radians){
-        elevatorIO.requestPosition(meters, radians);
+    public void requestMotionMagic(double meters){
+        elevatorIO.requestMotionMagic(meters);
     }
 
-    public void setVoltage(double volts){
+    public void requestVoltage(double volts){
         elevatorIO.requestVoltage(volts);
     }
 
