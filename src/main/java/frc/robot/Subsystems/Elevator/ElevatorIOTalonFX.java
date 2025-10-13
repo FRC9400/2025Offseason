@@ -49,13 +49,13 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         config.MotionMagic.MotionMagicAcceleration = elevatorConstants.Acceleration;
         config.MotionMagic.MotionMagicJerk = elevatorConstants.Jerk;
 
-        config.Slot0.kP = 1;//placeholders
+        config.Slot0.kP = 6.0235;//placeholders
         config.Slot0.kI = 0;
-        config.Slot0.kD = 0.01;
-        config.Slot0.kS = 0.09;
-        config.Slot0.kV = 0;
-        config.Slot0.kA = 0;
-        config.Slot0.kG = 0;
+        config.Slot0.kD = 0.15516;
+        config.Slot0.kS = 0.034291;
+        config.Slot0.kV = 0.12709;
+        config.Slot0.kA = 0.0030174;
+        config.Slot0.kG = 0.45551;
 
         config.CurrentLimits.StatorCurrentLimit = elevatorConstants.statorCurrentLimit;
         config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -66,7 +66,8 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         leftMotor.setPosition(0);
 
         leftMotor.getConfigurator().apply(config);
-        rightMotor.setControl(new Follower(canIDConstants.elevatorMotor1, false));
+        rightMotor.getConfigurator().apply(config);
+        rightMotor.setControl(new Follower(leftMotor.getDeviceID(), false));
         
         BaseStatusSignal.setUpdateFrequencyForAll(
             50,
@@ -109,6 +110,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         inputs.velocityMPS =  new double[] {Conversions.RPStoMPS(leftElevatorAngularVelocity.getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio), Conversions.RPStoMPS(rightElevatorAngularVelocity.getValueAsDouble(), elevatorConstants.wheelCircumferenceMeters, elevatorConstants.gearRatio)};
         inputs.currentAmps = new double[] {leftElevatorCurrent.getValueAsDouble(), rightElevatorCurrent.getValueAsDouble()};
         inputs.tempFahrenheit = new double[] {leftElevatorTemp.getValueAsDouble(), rightElevatorTemp.getValueAsDouble()};
+        inputs.elevatorHeightRotations = leftElevatorPos.getValueAsDouble();
     }
 
     public void requestMotionMagic(double meters){

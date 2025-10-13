@@ -10,6 +10,7 @@ public interface ElevatorIO {
         public double setpointMeters = 0;
         public double setpointVolts = 0;
         public double elevatorHeightMeters = 0;
+        public double elevatorHeightRotations = 0;
         public double[] velocityMPS = new double [] {};
         public double[] velocityRPS = new double [] {};
         public double[] voltage = new double [] {};

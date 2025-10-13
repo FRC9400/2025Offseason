@@ -6,7 +6,7 @@ public class canIDConstants {
     public static final String rio = "rio";
 
     /* Kinematics */
-    public static final int pigeon = 0;
+    public static final int pigeon = 1;
 
     /* Swerve: FL, FR, BL, BR */
     public static final int[] driveMotor = {16, 3, 13, 18};

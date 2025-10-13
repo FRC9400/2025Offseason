@@ -18,7 +18,7 @@ public class elevatorConstants {
     
     /* Max and Min Heights */
     public static final double minHeightMeters = 0;
-    public static final double maxHeightMeters = Units.inchesToMeters(24);
+    public static final double maxHeightMeters = Units.inchesToMeters(15);
     
     /* Current Limits */
     public static final double statorCurrentLimit = 80;
