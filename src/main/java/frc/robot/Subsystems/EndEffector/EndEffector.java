@@ -16,11 +16,8 @@ public class EndEffector extends SubsystemBase {
     private final EndEffectorIO endEffectorIO;
     private EndEffectorInputsAutoLogged inputs = new EndEffectorInputsAutoLogged();
     private EndEffectorStates endEffectorState = EndEffectorStates.IDLE;
-    private final SysIdRoutine pivotSysID;
     private double algaeSetpointVolts = 0;
     private double coralSetpointVolts = 0;
-    private double pivotSetpointVolts = 0;
-    private double pivotSetpointDeg = 0;
 
     public enum EndEffectorStates{
         IDLE,
@@ -31,40 +28,6 @@ public class EndEffector extends SubsystemBase {
 
     public EndEffector(EndEffectorIO endEffectorIO){
         this.endEffectorIO = endEffectorIO;
-        pivotSysID = new SysIdRoutine(
-                new SysIdRoutine.Config(null, Volts.of(3), null,
-                        (state) -> SignalLogger.writeString("state", state.toString())),
-                new SysIdRoutine.Mechanism((volts) -> endEffectorIO.requestPivotVoltage(volts.in(Volts)), null, this));
-    }
-
-    
-
-    public Command runSysIdCmd() {
-        return Commands.sequence(
-                this.runOnce(() -> SignalLogger.start()),
-                pivotSysID
-                        .quasistatic(Direction.kForward)
-                        .until(() -> Math.abs(inputs.pivotPosDeg) > 100),
-                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
-                Commands.waitSeconds(1),
-                pivotSysID
-                        .quasistatic(Direction.kReverse)
-                        .until(() -> inputs.pivotPosDeg < 5),
-                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
-                Commands.waitSeconds(1),
-
-                pivotSysID
-                        .dynamic(Direction.kForward)
-                        .until(() -> Math.abs(inputs.pivotPosDeg) > 100),
-                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
-                Commands.waitSeconds(1),
-
-                pivotSysID
-                        .dynamic(Direction.kReverse)
-                        .until(() -> inputs.pivotPosDeg < 5),
-                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
-                Commands.waitSeconds(1),
-                this.runOnce(() -> SignalLogger.stop()));
     }
 
     //state machine
@@ -76,24 +39,20 @@ public class EndEffector extends SubsystemBase {
 
         switch(endEffectorState){
             case IDLE:
-                endEffectorIO.setAlgaeVoltage(0);
-                endEffectorIO.setCoralVoltage(0);
-                endEffectorIO.setPivotVoltage(0);
+                endEffectorIO.requestAlgaeVoltage(0);
+                endEffectorIO.requestCoralVoltage(0);
                 break;
             case INTAKE:
-                endEffectorIO.setAlgaeVoltage(0);
-                endEffectorIO.setCoralVoltage(coralSetpointVolts);
-                endEffectorIO.setPivotMotionMagic(pivotSetpointDeg);
+                endEffectorIO.requestAlgaeVoltage(0);
+                endEffectorIO.requestCoralVoltage(coralSetpointVolts);
                 break;
             case SCORE:
-                endEffectorIO.setAlgaeVoltage(0);
-                endEffectorIO.setCoralVoltage(coralSetpointVolts);
-                endEffectorIO.setPivotMotionMagic(pivotSetpointDeg);
+                endEffectorIO.requestAlgaeVoltage(0);
+                endEffectorIO.requestCoralVoltage(coralSetpointVolts);
                 break;
             case HOLD_ALGAE:
-                endEffectorIO.setAlgaeVoltage(algaeSetpointVolts);
-                endEffectorIO.setCoralVoltage(0);
-                endEffectorIO.setPivotMotionMagic(pivotSetpointDeg);
+                endEffectorIO.requestAlgaeVoltage(algaeSetpointVolts);
+                endEffectorIO.requestCoralVoltage(0);
                 break;
             default:
                 break;
@@ -102,19 +61,11 @@ public class EndEffector extends SubsystemBase {
 
     // Control Requests
     public void requestAlgaeVoltage(double voltage){
-        endEffectorIO.requestAlgaeVoltage(voltage);
+        algaeSetpointVolts = voltage;
     }
 
     public void requestCoralVoltage(double voltage){
-        endEffectorIO.requestCoralVoltage(voltage);
-    }
-
-    public void requestPivotVoltage(double voltage){
-        endEffectorIO.requestPivotVoltage(voltage);
-    }
-
-    public void requestPivotMotionMagic(double degrees){
-        endEffectorIO.requestPivotMotionMagic(degrees);
+        coralSetpointVolts = voltage;
     }
 
     // states
@@ -122,7 +73,7 @@ public class EndEffector extends SubsystemBase {
         endEffectorState = nextState;
     }
 
-    public EndEffectorStates returnState(){
+    public EndEffectorStates getState(){
         return endEffectorState;
     }
 
@@ -141,5 +92,4 @@ public class EndEffector extends SubsystemBase {
     public void requestHoldAlgae(){
         setState(EndEffectorStates.HOLD_ALGAE);
     }
-
 }
