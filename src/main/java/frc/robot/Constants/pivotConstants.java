@@ -15,4 +15,5 @@ public class pivotConstants {
 
     /* Gear Ratio */
     public static double gearRatio = 138.89;
+    
 }
