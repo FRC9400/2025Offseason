@@ -34,7 +34,7 @@ public class EndEffector extends SubsystemBase {
         pivotSysID = new SysIdRoutine(
                 new SysIdRoutine.Config(null, Volts.of(3), null,
                         (state) -> SignalLogger.writeString("state", state.toString())),
-                new SysIdRoutine.Mechanism((volts) -> endEffectorIO.setPivotVoltage(volts.in(Volts)), null, this));
+                new SysIdRoutine.Mechanism((volts) -> endEffectorIO.requestPivotVoltage(volts.in(Volts)), null, this));
     }
 
     
@@ -45,24 +45,24 @@ public class EndEffector extends SubsystemBase {
                 pivotSysID
                         .quasistatic(Direction.kForward)
                         .until(() -> Math.abs(inputs.pivotPosDeg) > 100),
-                this.runOnce(() -> endEffectorIO.setPivotVoltage(0)),
+                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
                 Commands.waitSeconds(1),
                 pivotSysID
                         .quasistatic(Direction.kReverse)
                         .until(() -> inputs.pivotPosDeg < 5),
-                this.runOnce(() -> endEffectorIO.setPivotVoltage(0)),
+                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
                 Commands.waitSeconds(1),
 
                 pivotSysID
                         .dynamic(Direction.kForward)
                         .until(() -> Math.abs(inputs.pivotPosDeg) > 100),
-                this.runOnce(() -> endEffectorIO.setPivotVoltage(0)),
+                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
                 Commands.waitSeconds(1),
 
                 pivotSysID
                         .dynamic(Direction.kReverse)
                         .until(() -> inputs.pivotPosDeg < 5),
-                this.runOnce(() -> endEffectorIO.setPivotVoltage(0)),
+                this.runOnce(() -> endEffectorIO.requestPivotVoltage(0)),
                 Commands.waitSeconds(1),
                 this.runOnce(() -> SignalLogger.stop()));
     }
@@ -101,20 +101,20 @@ public class EndEffector extends SubsystemBase {
     }
 
     // Control Requests
-    public void setAlgaeVoltage(double voltage){
-        endEffectorIO.setAlgaeVoltage(voltage);
+    public void requestAlgaeVoltage(double voltage){
+        endEffectorIO.requestAlgaeVoltage(voltage);
     }
 
-    public void setCoralVoltage(double voltage){
-        endEffectorIO.setCoralVoltage(voltage);
+    public void requestCoralVoltage(double voltage){
+        endEffectorIO.requestCoralVoltage(voltage);
     }
 
-    public void setPivotVoltage(double voltage){
-        endEffectorIO.setPivotVoltage(voltage);
+    public void requestPivotVoltage(double voltage){
+        endEffectorIO.requestPivotVoltage(voltage);
     }
 
-    public void setPivotMotionMagic(double degrees){
-        endEffectorIO.setPivotMotionMagic(degrees);
+    public void requestPivotMotionMagic(double degrees){
+        endEffectorIO.requestPivotMotionMagic(degrees);
     }
 
     // states

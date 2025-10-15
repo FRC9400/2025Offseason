@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -72,7 +73,10 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
         algaeConfigs.MotorOutput.Inverted = endEffectorConstants.algaeMotorInvert;
         coralConfigs.MotorOutput.Inverted = endEffectorConstants.coralMotorInvert;
         pivotConfigs.MotorOutput.Inverted = endEffectorConstants.pivotMotorInvert;
+        pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         
+        pivot.setPosition(0);
+
         // Apply Configs
         algaeMotor.getConfigurator().apply(algaeConfigs);
         coral.getConfigurator().apply(coralConfigs);
@@ -111,6 +115,8 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
         // Bus Utilization
         algaeMotor.optimizeBusUtilization();
         coral.optimizeBusUtilization();
+
+
     }
 
     // Input Update + Refresh
@@ -143,33 +149,33 @@ public class EndEffectorIOTalonFX implements EndEffectorIO{
         inputs.pivotAppliedVolts = pivotVoltageRequest.Output;
         inputs.pivotSetpointVolts = pivotSetpointVolts;
         inputs.pivotSetpointDeg = pivotSetpointDeg;
-        inputs.pivotSetpointRot = Conversions.DegreesToRotations(pivotSetpointDeg, endEffectorConstants.gearRatio);
+        inputs.pivotSetpointRot = Conversions.DegreesToRotations(pivotSetpointDeg, endEffectorConstants.pivotGearRatio);
         inputs.pivotPosRot = pivotPos.getValueAsDouble();
-        inputs.pivotPosDeg = Conversions.RotationsToDegrees(pivotPos.getValueAsDouble(), endEffectorConstants.gearRatio); 
+        inputs.pivotPosDeg = Conversions.RotationsToDegrees(pivotPos.getValueAsDouble(), endEffectorConstants.pivotGearRatio); 
         inputs.pivotCurrent = algaeCurrent.getValueAsDouble();
         inputs.pivotRPS = algaeRPS.getValueAsDouble();
         inputs.pivotTemp = algaeTemp.getValueAsDouble();
     }
 
     // Set Voltage + Position  
-    public void setAlgaeVoltage(double voltage){
+    public void requestAlgaeVoltage(double voltage){
         this.algaeSetpointVolts = voltage;
         algaeMotor.setControl(algaeVoltageRequest.withOutput(algaeSetpointVolts));
     }
 
-    public void setCoralVoltage(double voltage){
+    public void requestCoralVoltage(double voltage){
         this.coralSetpointVolts = voltage;
         coral.setControl(coralVoltageRequest.withOutput(coralSetpointVolts));
     }
 
-    public void setPivotVoltage(double voltage){
+    public void requestPivotVoltage(double voltage){
         this.pivotSetpointVolts = voltage;
         pivot.setControl(pivotVoltageRequest.withOutput(pivotSetpointVolts));
     }
 
-    public void setPivotMotionMagic(double degrees){
+    public void requestPivotMotionMagic(double degrees){
         this.pivotSetpointDeg = degrees;
-        pivotSetpointRot = Conversions.DegreesToRotations(degrees, endEffectorConstants.gearRatio);
+        pivotSetpointRot = Conversions.DegreesToRotations(degrees, endEffectorConstants.pivotGearRatio);
         pivot.setControl(pivotMotionMagicRequest.withPosition(pivotSetpointRot));
     }
 

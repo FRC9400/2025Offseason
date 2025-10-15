@@ -17,6 +17,14 @@ public class Elevator extends SubsystemBase {
     private final ElevatorIO elevatorIO;
     ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private final SysIdRoutine elevatorRoutine;
+    private ElevatorStates elevatorState = ElevatorStates.IDLE;
+    private String position = "L1";
+
+    public enum ElevatorStates{
+        IDLE,
+        SETPOINT,
+        DOWN
+    }
 
     public Elevator(ElevatorIO elevatorIO) {
         this.elevatorIO = elevatorIO;
@@ -55,13 +63,77 @@ public class Elevator extends SubsystemBase {
             this.runOnce(() -> SignalLogger.stop()));
     }
 
-    public void setHeight(double meters, double radians){
-        elevatorIO.requestPosition(meters, radians);
+    public void requestMotionMagic(double meters){
+        elevatorIO.requestMotionMagic(meters);
+    }
+
+    public void requestVoltage(double volts){
+        elevatorIO.requestVoltage(volts);
+    }
+
+    public void setState(ElevatorStates next){elevatorState = next;}
+
+    public ElevatorStates getState(){return elevatorState;}
+
+    public String getSetpointString(){return position;}
+
+    public void requestIdle(){
+        elevatorState = ElevatorStates.IDLE;
+    }
+
+    public void requestL1(){
+        elevatorState = ElevatorStates.SETPOINT;
+        position = "L1";
+    }
+
+    public void requestL2(){
+        elevatorState = ElevatorStates.SETPOINT;
+        position = "L2";
+    }
+
+    public void requestL3(){
+        elevatorState = ElevatorStates.SETPOINT;
+        position = "L3";
+    }
+
+    public void requestL4(){
+        elevatorState = ElevatorStates.SETPOINT;
+        position = "L4";
+    }
+
+    public void requestDown(){
+        elevatorState = ElevatorStates.DOWN;
     }
 
     @Override
     public void periodic(){
         elevatorIO.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
+
+        switch(elevatorState){
+            case IDLE:
+                elevatorIO.requestVoltage(0);
+                break;
+            case SETPOINT:
+                if(position == "L4"){
+                    elevatorIO.requestMotionMagic(elevatorConstants.L4);
+                }
+                else if(position == "L3"){
+                    elevatorIO.requestMotionMagic(elevatorConstants.L3);
+                }
+                else if(position == "L2"){
+                    elevatorIO.requestMotionMagic(elevatorConstants.L2);
+                }
+                else if(position == "L1"){
+                    elevatorIO.requestMotionMagic(elevatorConstants.L1);
+                }
+                else{
+                    elevatorIO.requestVoltage(0);
+                }
+                break;
+            case DOWN:
+                elevatorIO.requestMotionMagic(0);
+                break;
+        }
     }
 }

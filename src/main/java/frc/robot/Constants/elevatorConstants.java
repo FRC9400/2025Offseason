@@ -13,12 +13,12 @@ public class elevatorConstants {
     public static final NeutralModeValue elevatorNeutralMode = NeutralModeValue.Brake;
     
     /* Mechanical Constants */
-    public static final double gearRatio = 6;
+    public static final double gearRatio = 7;
     public static final double wheelCircumferenceMeters = Units.inchesToMeters(1.4397*Math.PI);
     
     /* Max and Min Heights */
     public static final double minHeightMeters = 0;
-    public static final double maxHeightMeters = Units.inchesToMeters(24);
+    public static final double maxHeightMeters = Units.inchesToMeters(15);
     
     /* Current Limits */
     public static final double statorCurrentLimit = 80;

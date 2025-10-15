@@ -54,10 +54,6 @@ public class PivotIOTalonFX implements PivotIO {
     private final StatusSignal<Angle> rightPivot1Position;
     private final StatusSignal<Angle> rightPivot2Position;
 
-    /* Follower */
-    private final Follower followerWithoutInverse;
-    private final Follower followerWithInverse;
-
     /* Control Requests */
     private MotionMagicVoltage motionMagicRequest;
     private VoltageOut voltageOutRequest;
@@ -100,10 +96,6 @@ public class PivotIOTalonFX implements PivotIO {
         rightPivot1Position = rightMotor1.getRotorPosition();
         rightPivot2Position = rightMotor2.getRotorPosition();
 
-        /* Follower */
-        followerWithoutInverse = new Follower(leftMotor1.getDeviceID(), false);
-        followerWithInverse = new Follower(leftMotor1.getDeviceID(), true);
-
         /* Control Requests */
         motionMagicRequest = new MotionMagicVoltage(0).withSlot(0).withEnableFOC(true);
         voltageOutRequest = new VoltageOut(0).withEnableFOC(true);
@@ -142,10 +134,10 @@ public class PivotIOTalonFX implements PivotIO {
         leftMotor1.setPosition(0);
 
         /* Configure Configs */
-        leftMotor2.setControl(followerWithoutInverse);
-        rightMotor1.setControl(followerWithInverse);
-        rightMotor2.setControl(followerWithInverse);
         leftMotor1.getConfigurator().apply(leftMotor1Configs);
+        leftMotor2.setControl(new Follower(leftMotor1.getDeviceID(), false));
+        rightMotor1.setControl(new Follower(leftMotor1.getDeviceID(), true));
+        rightMotor2.setControl(new Follower(leftMotor1.getDeviceID(), true));
 
         /* Set Frequency */
         BaseStatusSignal.setUpdateFrequencyForAll(

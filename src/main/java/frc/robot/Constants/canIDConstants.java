@@ -6,11 +6,10 @@ public class canIDConstants {
     public static final String rio = "rio";
 
     /* Kinematics */
-    public static final int pigeon = 0;
+    public static final int pigeon = 1;
 
     /* Swerve: FL, FR, BL, BR */
-    public static final int[] driveMotor = {16, 3, 14, 18};
-    
+    public static final int[] driveMotor = {16, 3, 13, 18};
     public static final int[] steerMotor = {6, 5, 17, 20};
     public static final int[] CANcoder = {30, 31, 25, 9};
 
@@ -20,13 +19,13 @@ public class canIDConstants {
     public static final int pivotMotor = 33;
 
     /* Elevator */
-    public static final int leftElevatorMotor = 17;
-    public static final int rightElevatorMotor = 16;
+    public static final int elevatorMotor1 = 21;
+    public static final int elevatorMotor2 = 34;
 
     /* Pivot */
     public static final int leftPivotMotor1 = 7;
     public static final int leftPivotMotor2 = 4;
     public static final int rightPivotMotor1 = 2;
-    public static final int rightPivotMotor2 = 19;
+    public static final int rightPivotMotor2 = 14;
 
 }
