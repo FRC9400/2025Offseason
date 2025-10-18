@@ -23,8 +23,7 @@ public class Pivot extends SubsystemBase {
         pivotRoutine = new SysIdRoutine(
             new SysIdRoutine.Config(null, Volts.of(4), null,
                     (state) -> SignalLogger.writeString("state", state.toString())),
-            new SysIdRoutine.Mechanism((volts) -> pivotIO.requestVoltage(volts.in(Volts)), null,
-                    this));
+            new SysIdRoutine.Mechanism((volts) -> pivotIO.requestVoltage(volts.in(Volts)), null, this));
     }
 
     public Command pivotSysIdCmd(){
@@ -32,7 +31,7 @@ public class Pivot extends SubsystemBase {
             this.runOnce(() -> SignalLogger.start()),
             pivotRoutine
                     .quasistatic(Direction.kForward)
-                    .until(() -> Math.abs(inputs.positionDeg[0]) > 35), 
+                    .until(() -> Math.abs(inputs.positionDeg[0]) > 90), 
             this.runOnce(() -> pivotIO.requestVoltage(0)),
             Commands.waitSeconds(1),
             pivotRoutine
@@ -43,7 +42,7 @@ public class Pivot extends SubsystemBase {
 
             pivotRoutine
                     .dynamic(Direction.kForward)
-                    .until(() -> Math.abs(inputs.positionDeg[0]) > 35),
+                    .until(() -> Math.abs(inputs.positionDeg[0]) > 90),
             this.runOnce(() -> pivotIO.requestVoltage(0)),
             Commands.waitSeconds(1),
 

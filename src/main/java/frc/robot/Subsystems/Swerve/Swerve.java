@@ -86,8 +86,8 @@ public class Swerve extends SubsystemBase{
 
     private final SysIdRoutine steerRoutine = new SysIdRoutine(new SysIdRoutine.Config(
         null, 
-        Volts.of(5), 
-        Seconds.of(6), 
+        Volts.of(5),
+        Seconds.of(6),
         (state) -> SignalLogger.writeString("state", state.toString())), 
         new SysIdRoutine.Mechanism((
             Voltage volts) -> moduleIOs[0].steerVoltage(volts.in(Volts)),

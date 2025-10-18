@@ -14,5 +14,5 @@ public class pivotConstants {
     public static final NeutralModeValue pivotNeutralMode = NeutralModeValue.Brake;
 
     /* Gear Ratio */
-    public static double gearRatio = 138.89;
+    public static double gearRatio = 104.167;
 }

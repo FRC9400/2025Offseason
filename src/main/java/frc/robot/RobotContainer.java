@@ -15,6 +15,8 @@ import frc.robot.Subsystems.EndEffector.EndEffectorIOTalonFX;
 import frc.robot.Subsystems.Pivot.Pivot;
 import frc.robot.Subsystems.Pivot.PivotIOTalonFX;
 import frc.robot.Subsystems.Swerve.Swerve;
+import frc.robot.Subsystems.Wrist.Wrist;
+import frc.robot.Subsystems.Wrist.WristIOTalonFX;
 import frc.commons.LoggedTunableNumber;
 import frc.robot.Commands.TeleopSwerve;
 import frc.robot.Constants.elevatorConstants;
@@ -25,6 +27,7 @@ public class RobotContainer {
     private final Pivot pivot = new Pivot(new PivotIOTalonFX());
     private final Elevator elevator = new Elevator(new ElevatorIOTalonFX());
     private final Swerve swerve = new Swerve();
+    private final Wrist wrist = new Wrist(new WristIOTalonFX());
     private final EndEffector endEffector = new EndEffector(new EndEffectorIOTalonFX());
   
     public RobotContainer() {
@@ -45,14 +48,15 @@ public class RobotContainer {
 
     private void configureBindings() {
         driver.a().whileTrue(new RunCommand(() -> swerve.zeroWheels()));
-        operator.b().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
-        operator.x().whileTrue(new RunCommand(() -> pivot.requestVoltage(1)));
-        operator.y().whileTrue(new RunCommand(() -> pivot.requestVoltage(-1)));
         driver.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
         driver.rightBumper().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(1)));
         driver.rightTrigger().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(0)));
-        operator.a().whileTrue(elevator.elevatorSysIdCmd());
-        operator.leftBumper().whileTrue(new RunCommand(() -> elevator.requestVoltage(-1)));
+
+        operator.a().whileTrue(pivot.pivotSysIdCmd());
+        operator.b().whileTrue(new RunCommand(() -> elevator.requestVoltage(0)));
+        operator.x().whileTrue(new RunCommand(() -> elevator.requestVoltage(1)));
+        operator.y().whileTrue(new RunCommand(() -> elevator.requestVoltage(-1)));
+        operator.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
     }
 
     public Swerve getSwerve(){
