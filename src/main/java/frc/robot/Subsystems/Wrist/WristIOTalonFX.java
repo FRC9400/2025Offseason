@@ -56,18 +56,18 @@ public class WristIOTalonFX implements WristIO {
         pivot.setPosition(0);
 
         // Pivot PID Vals
-        pivotConfigs.Slot0.kP = 10;
+        pivotConfigs.Slot0.kP = 31;
         pivotConfigs.Slot0.kI = 0;
-        pivotConfigs.Slot0.kD = 0.023;
-        pivotConfigs.Slot0.kS = 0.20502;
-        pivotConfigs.Slot0.kV = 0.027833;
-        pivotConfigs.Slot0.kA = 0.02;
-        pivotConfigs.Slot0.kG = 1.6;
+        pivotConfigs.Slot0.kD = 0.1;
+        pivotConfigs.Slot0.kS = 0.61655;
+        pivotConfigs.Slot0.kV = 0.078492;
+        pivotConfigs.Slot0.kA = 0.01947;
+        pivotConfigs.Slot0.kG = 0.383;
         pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         
         // Motion Magic Configs for Pivot
-        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 75;
-        pivotConfigs.MotionMagic.MotionMagicAcceleration = 120;
+        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 100;
+        pivotConfigs.MotionMagic.MotionMagicAcceleration = 250;
         pivotConfigs.MotionMagic.MotionMagicJerk = 10000;
 
         pivot.getConfigurator().apply(pivotConfigs);
