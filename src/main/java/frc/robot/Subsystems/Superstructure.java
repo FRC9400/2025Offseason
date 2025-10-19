@@ -64,7 +64,8 @@ public class Superstructure extends SubsystemBase {
         PROCESSOR_B,
         TEST_CORAL_INTAKE,
         TEST_CORAL_SCORE,
-        TEST_DEALGAE
+        TEST_DEALGAE,
+        ZERO_WRIST
     }
 
     @Override
@@ -237,6 +238,12 @@ public class Superstructure extends SubsystemBase {
                      setState(SuperstructureStates.KICKSTAND);
                 }
                 break;
+            case ZERO_WRIST:
+                s_elevator.requestIdle();
+                s_endeffector.requestIdle();
+                s_pivot.requestHold();
+                s_wrist.zeroSensor();
+                break;
             default:
                 break;
         }
@@ -340,6 +347,10 @@ public class Superstructure extends SubsystemBase {
 
     public void requestTestDealgae(){
         setState(SuperstructureStates.TEST_DEALGAE);
+    }
+
+    public void zeroWrist(){
+        setState(SuperstructureStates.ZERO_WRIST);
     }
     
     private void setState(SuperstructureStates nextState){

@@ -62,6 +62,8 @@ public class RobotContainer {
         driver.leftTrigger().onTrue(new InstantCommand(() -> superstructure.requestTestCoralScore()));
 
         driver.rightTrigger().onTrue(new InstantCommand(() -> superstructure.requestTestDealgae()));
+
+        operator.a().onTrue(new InstantCommand(() -> superstructure.zeroWrist()));
     }
 
     public Swerve getSwerve(){
