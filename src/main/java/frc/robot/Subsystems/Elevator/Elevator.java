@@ -43,6 +43,7 @@ public class Elevator {
     }
 
     public void requestZero(){
+        elevatorSetpoint = 0;
         setState(ElevatorStates.ZERO);
     }
 
