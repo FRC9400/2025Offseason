@@ -10,6 +10,7 @@ public interface WristIO {
         public double pivotSetpointDeg = 0;
         public double pivotSetpointRot = 0;
         public double pivotAppliedVolts = 0;
+        public double pivotAppliedDeg = 0;
         public double pivotCurrent = 0;
         public double pivotRPS = 0;
         public double pivotTemp = 0;
@@ -19,9 +20,9 @@ public interface WristIO {
 
     public default void updateInputs(WristInputs inputs){}
 
-    public default void zeroPosition(){}
+    public default void setPosition(double degrees){}
     
-    public default void requestPivotVoltage(double voltage){}
+    public default void requestVoltage(double voltage){}
 
-    public default void requestPivotMotionMagic(double degrees){}
+    public default void requestMotionMagic(double degrees){}
 }

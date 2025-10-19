@@ -2,71 +2,71 @@ package frc.robot.Subsystems.Pivot;
 
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.SignalLogger;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
-import static edu.wpi.first.units.Units.Volts;
-
-public class Pivot extends SubsystemBase {
+public class Pivot {
     private final PivotIO pivotIO;
     private PivotIOInputsAutoLogged inputs = new PivotIOInputsAutoLogged();
-    private final SysIdRoutine pivotRoutine;
+    private PivotStates pivotState = PivotStates.IDLE;
+    private double pivotSetpoint = 0; 
 
+    public enum PivotStates{
+        IDLE,
+        SETPOINT, 
+        ZERO_SENSOR,
+        HOLD
+    }
 
     public Pivot(PivotIO pivotIO){
         this.pivotIO = pivotIO;
-        pivotRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(null, Volts.of(4), null,
-                    (state) -> SignalLogger.writeString("state", state.toString())),
-            new SysIdRoutine.Mechanism((volts) -> pivotIO.requestVoltage(volts.in(Volts)), null, this));
     }
 
-    public Command pivotSysIdCmd(){
-        return Commands.sequence(
-            this.runOnce(() -> SignalLogger.start()),
-            pivotRoutine
-                    .quasistatic(Direction.kForward)
-                    .until(() -> Math.abs(inputs.positionDeg[0]) > 90), 
-            this.runOnce(() -> pivotIO.requestVoltage(0)),
-            Commands.waitSeconds(1),
-            pivotRoutine
-                    .quasistatic(Direction.kReverse)
-                    .until(() -> inputs.positionDeg[0] < 5), 
-            this.runOnce(() -> pivotIO.requestVoltage(0)),
-            Commands.waitSeconds(1),
-
-            pivotRoutine
-                    .dynamic(Direction.kForward)
-                    .until(() -> Math.abs(inputs.positionDeg[0]) > 90),
-            this.runOnce(() -> pivotIO.requestVoltage(0)),
-            Commands.waitSeconds(1),
-
-            pivotRoutine
-                    .dynamic(Direction.kReverse)
-                    .until(() -> inputs.positionDeg[0] < 5), //Keep in mind the max height is around 0.6
-            this.runOnce(() -> pivotIO.requestVoltage(0)),
-            Commands.waitSeconds(1),
-            this.runOnce(() -> SignalLogger.stop()));
-    }
-    
-
-    @Override
-    public void periodic(){
+    public void Loop(){
         pivotIO.updateInputs(inputs);
         Logger.processInputs("Pivot", inputs);
+        Logger.recordOutput("Pivot State", pivotState);
+        Logger.recordOutput("Pivot Setpoint", pivotSetpoint);
+
+        switch(pivotState){
+            case IDLE:
+                pivotIO.requestVoltage(0);
+            case SETPOINT:
+                pivotIO.requestMotionMagic(pivotSetpoint);
+            case ZERO_SENSOR:
+                pivotIO.setPosition(0);
+                pivotIO.requestMotionMagic(pivotSetpoint);
+            case HOLD:
+                pivotIO.requestMotionMagic(pivotSetpoint);
+            default:
+                break;
+        }
     }
 
-    public void requestMotionMagic(double deg){
-        pivotIO.requestMotionMagic(deg);
+    public void requestIdle(){
+        setState(PivotStates.IDLE);
     }
 
-    public void requestVoltage(double volts){
-        pivotIO.requestVoltage(volts);
+    public void requestSetpoint(double degrees){
+        pivotSetpoint = degrees;
+        setState(PivotStates.SETPOINT);
+    }
+
+    public void requestHold(){
+        setState(PivotStates.HOLD);
+    }
+
+    public void zeroSensor(){
+        setState(PivotStates.ZERO_SENSOR);
+    }
+
+    public boolean atSetpoint(){
+        return Math.abs(inputs.positionDeg[0] - pivotSetpoint) < 2;
+    }
+
+    public void setState(PivotStates nextState){
+        this.pivotState = nextState;
+    }
+
+    public PivotStates getPivotStates(){
+        return this.pivotState;
     }
     
 }

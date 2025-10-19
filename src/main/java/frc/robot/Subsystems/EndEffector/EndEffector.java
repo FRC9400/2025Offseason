@@ -1,56 +1,74 @@
 package frc.robot.Subsystems.EndEffector;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.SignalLogger;
+import frc.commons.LoggedTunableNumber;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
-public class EndEffector extends SubsystemBase {
+public class EndEffector {
     private final EndEffectorIO endEffectorIO;
     private EndEffectorInputsAutoLogged inputs = new EndEffectorInputsAutoLogged();
     private EndEffectorStates endEffectorState = EndEffectorStates.IDLE;
     private double algaeSetpointVolts = 0;
     private double coralSetpointVolts = 0;
 
+    public boolean hasAlgae = false;
+    LoggedTunableNumber algaeVoltage = new LoggedTunableNumber("Elevator/Hold Algae Voltage", 2);
+
     public enum EndEffectorStates{
         IDLE,
-        INTAKE,
-        SCORE,
-        HOLD_ALGAE
+        INTAKE_CORAL,
+        OUTTAKE_CORAL,
+        DEALGAE,
+        BARGE,
+        PROCESSOR
     }
 
     public EndEffector(EndEffectorIO endEffectorIO){
         this.endEffectorIO = endEffectorIO;
     }
 
-    //state machine
-    @Override
-    public void periodic(){
+    public void Loop(){
         endEffectorIO.updateInputs(inputs);
         Logger.processInputs("End Effector", inputs);
         Logger.recordOutput("End Effector State", this.endEffectorState);
+        Logger.recordOutput("Coral Setpoint", coralSetpointVolts);
+        Logger.recordOutput("Algae Setpoint", algaeSetpointVolts);
+
 
         switch(endEffectorState){
             case IDLE:
-                endEffectorIO.requestAlgaeVoltage(0);
+                endEffectorIO.requestCoralVoltage(0);
+                if (hasAlgae){
+                    endEffectorIO.requestAlgaeVoltage(algaeVoltage.get());
+                } else {
+                    endEffectorIO.requestAlgaeVoltage(0);
+                }
+                break;
+            case INTAKE_CORAL:
+                endEffectorIO.requestCoralVoltage(coralSetpointVolts);
+                if (hasAlgae){
+                    endEffectorIO.requestAlgaeVoltage(algaeVoltage.get());
+                } else {
+                    endEffectorIO.requestAlgaeVoltage(0);
+                }
+                break;
+            case OUTTAKE_CORAL:
+                endEffectorIO.requestCoralVoltage(coralSetpointVolts);
+                if (hasAlgae){
+                    endEffectorIO.requestAlgaeVoltage(algaeVoltage.get());
+                } else {
+                    endEffectorIO.requestAlgaeVoltage(0);
+                }
+                break;
+            case DEALGAE:
+                endEffectorIO.requestAlgaeVoltage(algaeSetpointVolts);
                 endEffectorIO.requestCoralVoltage(0);
                 break;
-            case INTAKE:
-                endEffectorIO.requestAlgaeVoltage(0);
-                endEffectorIO.requestCoralVoltage(coralSetpointVolts);
+            case BARGE:
+                endEffectorIO.requestAlgaeVoltage(algaeSetpointVolts);
+                endEffectorIO.requestCoralVoltage(0);
                 break;
-            case SCORE:
-                endEffectorIO.requestAlgaeVoltage(0);
-                endEffectorIO.requestCoralVoltage(coralSetpointVolts);
-                break;
-            case HOLD_ALGAE:
+            case PROCESSOR:
                 endEffectorIO.requestAlgaeVoltage(algaeSetpointVolts);
                 endEffectorIO.requestCoralVoltage(0);
                 break;
@@ -59,37 +77,48 @@ public class EndEffector extends SubsystemBase {
         }
     }
 
-    // Control Requests
-    public void requestAlgaeVoltage(double voltage){
-        algaeSetpointVolts = voltage;
-    }
-
-    public void requestCoralVoltage(double voltage){
-        coralSetpointVolts = voltage;
-    }
-
-    // states
-    public void setState(EndEffectorStates nextState){
-        endEffectorState = nextState;
-    }
-
-    public EndEffectorStates getState(){
-        return endEffectorState;
-    }
-
     public void requestIdle(){
         setState(EndEffectorStates.IDLE);
     }
 
-    public void requestIntake(){
-        setState(EndEffectorStates.INTAKE);
+    public void requestCoralIntake(double voltage){
+        coralSetpointVolts = voltage;
+        setState(EndEffectorStates.INTAKE_CORAL);
     }
 
-    public void requestScore(){
-        setState(EndEffectorStates.SCORE);
+    public void requestCoralOuttake(double voltage){
+        coralSetpointVolts = voltage;
+        setState(EndEffectorStates.OUTTAKE_CORAL);
     }
 
-    public void requestHoldAlgae(){
-        setState(EndEffectorStates.HOLD_ALGAE);
+    public void requestDealgae(double voltage){
+        algaeSetpointVolts = voltage;
+        setState(EndEffectorStates.DEALGAE);
+    }
+
+    public void requestBarge(double voltage){
+        algaeSetpointVolts = voltage;
+        setState(EndEffectorStates.BARGE);
+    }
+
+    public void requestProcessor(double voltage){
+        algaeSetpointVolts = voltage;
+        setState(EndEffectorStates.PROCESSOR);
+    }
+
+    public double getAlgaeCurrent(){
+        return inputs.algaeCurrent;
+    }
+
+    public double getCoralCurrent(){
+        return inputs.coralCurrent;
+    }
+
+    public void setState(EndEffectorStates nextState){
+        this.endEffectorState = nextState;
+    }
+
+    public EndEffectorStates getEndEffectorState(){
+        return this.endEffectorState;
     }
 }

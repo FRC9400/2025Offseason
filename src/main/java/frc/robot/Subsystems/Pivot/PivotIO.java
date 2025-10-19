@@ -25,4 +25,7 @@ public interface PivotIO {
     public default void requestVoltage(double volts){}
 
     public default void requestMotionMagic(double deg){}
+
+    public default void setPosition(double degrees){}
+
 }

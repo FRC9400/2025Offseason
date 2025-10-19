@@ -6,29 +6,28 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Subsystems.Elevator.Elevator;
+import frc.robot.Subsystems.Superstructure;
+import frc.robot.Subsystems.Elevator.ElevatorIO;
 import frc.robot.Subsystems.Elevator.ElevatorIOTalonFX;
-import frc.robot.Subsystems.EndEffector.EndEffector;
+import frc.robot.Subsystems.EndEffector.EndEffectorIO;
 import frc.robot.Subsystems.EndEffector.EndEffectorIOTalonFX;
-import frc.robot.Subsystems.Pivot.Pivot;
+import frc.robot.Subsystems.Pivot.PivotIO;
 import frc.robot.Subsystems.Pivot.PivotIOTalonFX;
 import frc.robot.Subsystems.Swerve.Swerve;
-import frc.robot.Subsystems.Wrist.Wrist;
+import frc.robot.Subsystems.Wrist.WristIO;
 import frc.robot.Subsystems.Wrist.WristIOTalonFX;
-import frc.commons.LoggedTunableNumber;
 import frc.robot.Commands.TeleopSwerve;
-import frc.robot.Constants.elevatorConstants;
 
 public class RobotContainer {
     public static final CommandXboxController driver = new CommandXboxController(0);
-    public static final CommandXboxController operator = new CommandXboxController(1);    
-    private final Pivot pivot = new Pivot(new PivotIOTalonFX());
-    private final Elevator elevator = new Elevator(new ElevatorIOTalonFX());
+    public static final CommandXboxController operator = new CommandXboxController(1); 
+    private final PivotIO s_pivot = new PivotIOTalonFX();
+    private final EndEffectorIO s_endeffector = new EndEffectorIOTalonFX();
+    private final ElevatorIO s_elevator = new ElevatorIOTalonFX();
+    private final WristIO s_wrist = new WristIOTalonFX(); 
+    private final Superstructure superstructure = new Superstructure(s_elevator,s_endeffector,s_pivot,s_wrist);
     private final Swerve swerve = new Swerve();
-    private final Wrist wrist = new Wrist(new WristIOTalonFX());
-    private final EndEffector endEffector = new EndEffector(new EndEffectorIOTalonFX());
   
     public RobotContainer() {
         swerve.zeroGyro();
@@ -47,20 +46,30 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
-        driver.a().whileTrue(new RunCommand(() -> swerve.zeroWheels()));
-        driver.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
-        driver.rightBumper().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(1)));
-        driver.rightTrigger().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(0)));
 
-        operator.a().whileTrue(pivot.pivotSysIdCmd());
-        operator.b().whileTrue(new RunCommand(() -> elevator.requestVoltage(0)));
-        operator.x().whileTrue(new RunCommand(() -> elevator.requestVoltage(1)));
-        operator.y().whileTrue(new RunCommand(() -> elevator.requestVoltage(-1)));
-        operator.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
+        driver.a().onTrue(new InstantCommand(() -> swerve.zeroWheels()));
+
+        driver.b().onTrue(new InstantCommand(() -> superstructure.requestKickstand()));
+
+        driver.x().onTrue(new InstantCommand(() -> superstructure.requestIdle()));
+
+        // driver.y().onTrue(new InstantCommand(() -> superstructure.requestGroundIntake()));
+
+        // driver.leftBumper().onTrue(new InstantCommand(() -> superstructure.requestStationIntake()));
+
+        driver.rightBumper().onTrue(new InstantCommand(() -> superstructure.requestTestCoralIntake()));
+
+        driver.leftTrigger().onTrue(new InstantCommand(() -> superstructure.requestTestCoralScore()));
+
+        driver.rightTrigger().onTrue(new InstantCommand(() -> superstructure.requestTestDealgae()));
     }
 
     public Swerve getSwerve(){
         return swerve;
+    }
+
+    public Superstructure getSuperstructure(){
+        return superstructure;
     }
 
 }

@@ -223,4 +223,8 @@ public class PivotIOTalonFX implements PivotIO {
         leftMotor1.setControl(motionMagicRequest.withPosition(Conversions.DegreesToRotations(deg, pivotConstants.gearRatio)));
     }
 
+    public void setPosition(double degrees){
+        leftMotor1.setPosition(degrees);
+    }
+
 }

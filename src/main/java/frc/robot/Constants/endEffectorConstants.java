@@ -9,9 +9,9 @@ public class endEffectorConstants {
     public static final InvertedValue pivotMotorInvert = InvertedValue.Clockwise_Positive;
 
     /* Current Limits */
-    public static final double algaeCurrentLimit = 50;
-    public static final double coralCurrentLimit = 50;
-    public static final double pivotCurrentLimit = 50;
+    public static final double algaeCurrentLimit = 70;
+    public static final double coralCurrentLimit = 70;
+    public static final double pivotCurrentLimit = 70;
 
     /* Gear Ratios */
     public static final double algaeGearRatio = 6.111;

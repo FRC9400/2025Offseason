@@ -1,73 +1,73 @@
 package frc.robot.Subsystems.Wrist;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import org.littletonrobotics.junction.Logger;
 
-import com.ctre.phoenix6.SignalLogger;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-
-public class Wrist extends SubsystemBase {
+public class Wrist {
     private final WristIO wristIO;
     private WristInputsAutoLogged inputs = new WristInputsAutoLogged();
-    private final SysIdRoutine wristRoutine;
-    private double pivotSetpointVolts = 0;
-    private double pivotSetpointDeg = 0;
+    private WristStates wristState = WristStates.IDLE;
+    private double wristSetpoint = 0;
+
+
+    public enum WristStates{
+        IDLE,
+        SETPOINT, 
+        ZERO_SENSOR,
+        HOLD
+    }
 
     public Wrist(WristIO wristIO){
         this.wristIO = wristIO;
-        wristRoutine = new SysIdRoutine(
-                new SysIdRoutine.Config(null, Volts.of(3), null,
-                        (state) -> SignalLogger.writeString("state", state.toString())),
-                new SysIdRoutine.Mechanism((volts) -> wristIO.requestPivotVoltage(volts.in(Volts)), null, this));
     }
 
-    public Command wristSysIdCmd(){
-        return Commands.sequence(
-            this.runOnce(() -> SignalLogger.start()),
-            wristRoutine
-                    .quasistatic(Direction.kForward)
-                    .until(() -> Math.abs(inputs.pivotPosDeg) > 90), 
-            this.runOnce(() -> wristIO.requestPivotVoltage(0)),
-            Commands.waitSeconds(1),
-            wristRoutine
-                    .quasistatic(Direction.kReverse)
-                    .until(() -> inputs.pivotPosDeg < 5), 
-            this.runOnce(() -> wristIO.requestPivotVoltage(0)),
-            Commands.waitSeconds(1),
-
-            wristRoutine
-                    .dynamic(Direction.kForward)
-                    .until(() -> Math.abs(inputs.pivotPosDeg) > 90),
-            this.runOnce(() -> wristIO.requestPivotVoltage(0)),
-            Commands.waitSeconds(1),
-
-            wristRoutine
-                    .dynamic(Direction.kReverse)
-                    .until(() -> inputs.pivotPosDeg < 5), //Keep in mind the max height is around 0.6
-            this.runOnce(() -> wristIO.requestPivotVoltage(0)),
-            Commands.waitSeconds(1),
-            this.runOnce(() -> SignalLogger.stop()));
-    }
-
-    //state machine
-    @Override
-    public void periodic(){
+    public void Loop(){
         wristIO.updateInputs(inputs);
         Logger.processInputs("Wrist", inputs);
+        Logger.recordOutput("Wrist Setpoint", wristSetpoint);
+        Logger.recordOutput("Wrist State", wristState);
+        
+        switch(wristState){
+                case IDLE:
+                        wristIO.requestVoltage(0);
+                case SETPOINT:
+                        wristIO.requestMotionMagic(wristSetpoint);
+                case ZERO_SENSOR:
+                        wristIO.setPosition(0);
+                        wristIO.requestMotionMagic(wristSetpoint);
+                case HOLD:
+                        wristIO.requestMotionMagic(wristSetpoint);
+                default:
+                        break;
+        }
     }
 
-    // Control Requests
-    public void requestPivotVoltage(double voltage){
-        pivotSetpointVolts = voltage;
+    public void requestIdle(){
+        setState(WristStates.IDLE);
     }
 
-    public void requestPivotMotionMagic(double degrees){
-        pivotSetpointDeg = degrees;
+    public void requestSetpoint(double degrees){
+        wristSetpoint = degrees;
+        setState(WristStates.SETPOINT);
     }
+
+    public void requestHold(){
+        setState(WristStates.HOLD);
+    }
+
+    public void zeroSensor(){
+        setState(WristStates.ZERO_SENSOR);
+    }
+
+    public boolean atSetpoint(){
+        return Math.abs(inputs.pivotPosDeg - wristSetpoint) < 2;
+    }
+
+    public void setState(WristStates nextState){
+        this.wristState = nextState;
+    }
+
+    public WristStates getWristState(){
+        return this.wristState;
+    }
+
 }

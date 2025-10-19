@@ -8,14 +8,12 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.commons.Conversions;
-import frc.commons.LoggedTunableNumber;
 import frc.robot.Constants.canIDConstants;
 import frc.robot.Constants.elevatorConstants;
 
@@ -49,7 +47,7 @@ public class ElevatorIOTalonFX implements ElevatorIO{
         config.MotionMagic.MotionMagicAcceleration = elevatorConstants.Acceleration;
         config.MotionMagic.MotionMagicJerk = elevatorConstants.Jerk;
 
-        config.Slot0.kP = 6.0235;//placeholders
+        config.Slot0.kP = 6.0235;
         config.Slot0.kI = 0;
         config.Slot0.kD = 0.15516;
         config.Slot0.kS = 0.034291;
