@@ -241,7 +241,7 @@ public class Superstructure extends SubsystemBase {
             case ZERO_WRIST:
                 s_elevator.requestIdle();
                 s_endeffector.requestIdle();
-                s_pivot.requestHold();
+                s_pivot.requestIdle();
                 s_wrist.zeroSensor();
                 break;
             default:
