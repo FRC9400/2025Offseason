@@ -51,11 +51,13 @@ public class RobotContainer {
         driver.rightBumper().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(1)));
         driver.rightTrigger().whileTrue(new RunCommand(() -> endEffector.requestCoralVoltage(0)));
 
-        operator.a().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(-20)));
+        operator.a().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(20)));
         operator.b().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(0)));
-        operator.x().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(-10)));
-        operator.y().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(-50)));
+        operator.x().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(10)));
+        operator.y().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(50)));
         operator.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(1)));
+        operator.rightBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
+        
     }
 
     public Swerve getSwerve(){

@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants.canIDConstants;
 import frc.robot.Constants.wristConstants;
 import frc.commons.Conversions;
@@ -37,6 +38,7 @@ public class WristIOTalonFX implements WristIO {
     private final StatusSignal<Temperature> pivotTemp = pivot.getDeviceTemp();
     private final StatusSignal<AngularVelocity> pivotRPS = pivot.getRotorVelocity();
     private final StatusSignal<Angle> pivotPos = pivot.getRotorPosition();
+    private final StatusSignal<Voltage> pivotVolts = pivot.getMotorVoltage();
 
     public WristIOTalonFX(){
         // Control Requests
@@ -52,9 +54,6 @@ public class WristIOTalonFX implements WristIO {
         pivotConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         
         pivot.setPosition(0);
-
-        // Apply Configs
-
 
         // Pivot PID Vals
         pivotConfigs.Slot0.kP = 10;
@@ -79,7 +78,8 @@ public class WristIOTalonFX implements WristIO {
             pivotCurrent,
             pivotTemp,
             pivotRPS,
-            pivotPos
+            pivotPos,
+            pivotVolts
         );
 
         // Bus Utilization
@@ -92,7 +92,8 @@ public class WristIOTalonFX implements WristIO {
             pivotCurrent,
             pivotTemp,
             pivotRPS,
-            pivotPos
+            pivotPos,
+            pivotVolts
         );
 
         inputs.pivotAppliedVolts = pivotVoltageRequest.Output;
