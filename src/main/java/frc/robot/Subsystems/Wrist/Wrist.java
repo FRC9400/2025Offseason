@@ -29,13 +29,17 @@ public class Wrist {
         switch(wristState){
                 case IDLE:
                         wristIO.requestVoltage(0);
+                        break;
                 case SETPOINT:
                         wristIO.requestMotionMagic(wristSetpoint);
+                        break;
                 case ZERO_SENSOR:
                         wristIO.setPosition(0);
-                        wristIO.requestMotionMagic(wristSetpoint);
+                        wristIO.requestVoltage(0);
+                        break;
                 case HOLD:
                         wristIO.requestMotionMagic(wristSetpoint);
+                        break;
                 default:
                         break;
         }

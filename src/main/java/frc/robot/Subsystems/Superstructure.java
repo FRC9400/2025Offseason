@@ -36,6 +36,11 @@ public class Superstructure extends SubsystemBase {
     LoggedTunableNumber bargeVoltage = new LoggedTunableNumber("Superstructure/Algae Barge Voltage", -3);
     LoggedTunableNumber processorVoltage = new LoggedTunableNumber("Superstructure/Algae Processor Voltage", -3);
 
+    LoggedTunableNumber elevatorPos = new LoggedTunableNumber("Superstructure/Elevator Position", 0);
+    LoggedTunableNumber pivotPos = new LoggedTunableNumber("Superstructure/Pivot Degrees", 0);
+    LoggedTunableNumber wristPos = new LoggedTunableNumber("Superstructure/Wrist degrees", 0);
+
+
     public Superstructure(ElevatorIO elevatorIO, EndEffectorIO endEffectorIO, PivotIO pivotIO, WristIO wristIO){
         this.s_elevator = new Elevator(elevatorIO);
         this.s_endeffector = new EndEffector(endEffectorIO);
@@ -45,6 +50,7 @@ public class Superstructure extends SubsystemBase {
 
     public enum SuperstructureStates{
         IDLE,
+        ZERO,
         ELEVATOR_DOWN,
         KICKSTAND,
         STATION_INTAKE_A,
@@ -65,6 +71,7 @@ public class Superstructure extends SubsystemBase {
         TEST_CORAL_INTAKE,
         TEST_CORAL_SCORE,
         TEST_DEALGAE,
+        TEST_ARM_POSITION,
         ZERO_WRIST
     }
 
@@ -82,6 +89,12 @@ public class Superstructure extends SubsystemBase {
                 s_endeffector.requestIdle();
                 s_pivot.requestIdle();
                 s_wrist.requestIdle();
+                break;
+            case ZERO:
+                s_elevator.requestZero();
+                s_endeffector.requestIdle();
+                s_pivot.requestSetpoint(0);
+                s_wrist.requestSetpoint(0);
                 break;
             case ELEVATOR_DOWN:
                 s_elevator.requestZero();
@@ -210,6 +223,12 @@ public class Superstructure extends SubsystemBase {
                     setState(SuperstructureStates.KICKSTAND);
                 }
                 break;
+            case TEST_ARM_POSITION:
+                s_elevator.requestSetpoint(elevatorPos.get());
+                s_endeffector.requestIdle();
+                s_pivot.requestSetpoint(pivotPos.get());
+                s_wrist.requestSetpoint(wristPos.get());
+                break;
             case TEST_CORAL_INTAKE:
                 s_elevator.requestZero();
                 s_endeffector.requestCoralIntake(coralIntakeVoltage.get());
@@ -285,6 +304,10 @@ public class Superstructure extends SubsystemBase {
         setState(SuperstructureStates.IDLE);
     }
 
+    public void requestZero(){
+        setState(SuperstructureStates.ZERO);
+    }
+
     public void requestKickstand(){
         setState(SuperstructureStates.KICKSTAND);
     }
@@ -347,6 +370,10 @@ public class Superstructure extends SubsystemBase {
 
     public void requestTestDealgae(){
         setState(SuperstructureStates.TEST_DEALGAE);
+    }
+
+    public void requestTestArmPosition(){
+        setState(SuperstructureStates.TEST_ARM_POSITION);
     }
 
     public void zeroWrist(){

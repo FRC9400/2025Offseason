@@ -28,13 +28,17 @@ public class Pivot {
         switch(pivotState){
             case IDLE:
                 pivotIO.requestVoltage(0);
+                break;
             case SETPOINT:
                 pivotIO.requestMotionMagic(pivotSetpoint);
+                break;
             case ZERO_SENSOR:
                 pivotIO.setPosition(0);
-                pivotIO.requestMotionMagic(pivotSetpoint);
+                pivotIO.requestVoltage(0);
+                break;
             case HOLD:
                 pivotIO.requestMotionMagic(pivotSetpoint);
+                break;
             default:
                 break;
         }
