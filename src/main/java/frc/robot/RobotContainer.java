@@ -55,7 +55,8 @@ public class RobotContainer {
         operator.b().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(0)));
         operator.x().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(10)));
         operator.y().whileTrue(new RunCommand(() -> wrist.requestPivotMotionMagic(50)));
-        operator.leftBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(1)));
+        operator.leftBumper().whileTrue(wrist.wristSysIdCmd());
+        operator.leftTrigger().whileTrue(new RunCommand(() -> pivot.requestVoltage(1)));
         operator.rightBumper().whileTrue(new RunCommand(() -> pivot.requestVoltage(0)));
         
     }
