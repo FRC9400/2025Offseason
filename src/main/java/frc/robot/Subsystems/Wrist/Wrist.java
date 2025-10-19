@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.commons.LoggedTunableNumber;
 
 public class Wrist extends SubsystemBase {
     private final WristIO wristIO;
@@ -40,7 +41,6 @@ public class Wrist extends SubsystemBase {
                     .until(() -> inputs.pivotPosDeg < 5), 
             this.runOnce(() -> wristIO.requestPivotVoltage(0)),
             Commands.waitSeconds(1),
-
             wristRoutine
                     .dynamic(Direction.kForward)
                     .until(() -> Math.abs(inputs.pivotPosDeg) > 90),
@@ -60,14 +60,17 @@ public class Wrist extends SubsystemBase {
     public void periodic(){
         wristIO.updateInputs(inputs);
         Logger.processInputs("Wrist", inputs);
+        Logger.recordOutput("Wrist Setpoint", pivotSetpointDeg);
     }
 
     // Control Requests
     public void requestPivotVoltage(double voltage){
         pivotSetpointVolts = voltage;
+        wristIO.requestPivotVoltage(voltage);
     }
 
     public void requestPivotMotionMagic(double degrees){
         pivotSetpointDeg = degrees;
+        wristIO.requestPivotMotionMagic(degrees);
     }
 }

@@ -10,6 +10,7 @@ public interface WristIO {
         public double pivotSetpointDeg = 0;
         public double pivotSetpointRot = 0;
         public double pivotAppliedVolts = 0;
+        public double pivotAppliedDeg = 0;
         public double pivotCurrent = 0;
         public double pivotRPS = 0;
         public double pivotTemp = 0;

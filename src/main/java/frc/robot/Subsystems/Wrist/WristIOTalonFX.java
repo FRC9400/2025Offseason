@@ -16,9 +16,10 @@ import edu.wpi.first.units.measure.Temperature;
 import frc.robot.Constants.canIDConstants;
 import frc.robot.Constants.wristConstants;
 import frc.commons.Conversions;
+import frc.commons.LoggedTunableNumber;
 
-public class WristIOTalonFX implements WristIO{
-    // Motors + Configs, UPDATE CANBUS*****
+public class WristIOTalonFX implements WristIO {
+    // Motors + Configs
     private final TalonFX pivot = new TalonFX(canIDConstants.pivotMotor, "rio");
     private final TalonFXConfiguration pivotConfigs = new TalonFXConfiguration();
 
@@ -53,22 +54,24 @@ public class WristIOTalonFX implements WristIO{
         pivot.setPosition(0);
 
         // Apply Configs
-        pivot.getConfigurator().apply(pivotConfigs);
+
 
         // Pivot PID Vals
-        pivotConfigs.Slot0.kP = 8;
+        pivotConfigs.Slot0.kP = 10;
         pivotConfigs.Slot0.kI = 0;
-        pivotConfigs.Slot0.kD = 0;
-        pivotConfigs.Slot0.kS = 0;
-        pivotConfigs.Slot0.kV = 0;
-        pivotConfigs.Slot0.kA = 0;
-        pivotConfigs.Slot0.kG = 0;
+        pivotConfigs.Slot0.kD = 0.023;
+        pivotConfigs.Slot0.kS = 0.20502;
+        pivotConfigs.Slot0.kV = 0.027833;
+        pivotConfigs.Slot0.kA = 0.02;
+        pivotConfigs.Slot0.kG = 1.6;
         pivotConfigs.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
         
         // Motion Magic Configs for Pivot
-        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 0;
-        pivotConfigs.MotionMagic.MotionMagicAcceleration = 0;
-        pivotConfigs.MotionMagic.MotionMagicJerk = 0;
+        pivotConfigs.MotionMagic.MotionMagicCruiseVelocity = 75;
+        pivotConfigs.MotionMagic.MotionMagicAcceleration = 120;
+        pivotConfigs.MotionMagic.MotionMagicJerk = 10000;
+
+        pivot.getConfigurator().apply(pivotConfigs);
 
         // Frequency Update
         BaseStatusSignal.setUpdateFrequencyForAll(
@@ -93,6 +96,7 @@ public class WristIOTalonFX implements WristIO{
         );
 
         inputs.pivotAppliedVolts = pivotVoltageRequest.Output;
+        inputs.pivotAppliedDeg = Conversions.RotationsToDegrees(pivotMotionMagicRequest.Position, wristConstants.pivotGearRatio);
         inputs.pivotSetpointVolts = pivotSetpointVolts;
         inputs.pivotSetpointDeg = pivotSetpointDeg;
         inputs.pivotSetpointRot = Conversions.DegreesToRotations(pivotSetpointDeg, wristConstants.pivotGearRatio);
