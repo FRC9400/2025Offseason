@@ -115,7 +115,7 @@ public class PivotIOTalonFX implements PivotIO {
         /* Slot 0 Configuration */
         leftMotor1Configs.Slot0.kP = 18.283;
         leftMotor1Configs.Slot0.kI = 0;
-        leftMotor1Configs.Slot0.kD = 0.3557;
+        leftMotor1Configs.Slot0.kD = 0.1;
         leftMotor1Configs.Slot0.kS = 0.1716;
         leftMotor1Configs.Slot0.kV = 0.12787;
         leftMotor1Configs.Slot0.kA = 0.005205;
@@ -135,8 +135,7 @@ public class PivotIOTalonFX implements PivotIO {
 
         /* Configure Configs */
         leftMotor1.getConfigurator().apply(leftMotor1Configs);
-        leftMotor2.getConfigurator().apply(leftMotor1Configs);
-        leftMotor2.setControl(new Follower(leftMotor1.getDeviceID(), false));
+       // leftMotor2.setControl(new Follower(leftMotor1.getDeviceID(), false));
         rightMotor1.setControl(new Follower(leftMotor1.getDeviceID(), true));
         rightMotor2.setControl(new Follower(leftMotor1.getDeviceID(), true));
 

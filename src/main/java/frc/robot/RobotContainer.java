@@ -59,7 +59,7 @@ public class RobotContainer {
 
         // driver.leftBumper().onTrue(new InstantCommand(() -> superstructure.requestStationIntake()));
 
-        driver.rightBumper().onTrue(new InstantCommand(() -> superstructure.requestTestCoralIntake()));
+        driver.rightBumper().onTrue(new InstantCommand(() -> superstructure.requestStationIntake()));
 
         driver.leftTrigger().onTrue(new InstantCommand(() -> superstructure.requestTestCoralScore()));
 
@@ -68,6 +68,10 @@ public class RobotContainer {
         operator.a().onTrue(new InstantCommand(() -> superstructure.zeroWrist()));
 
         operator.b().onTrue(new InstantCommand(() -> superstructure.requestTestArmPosition()));
+
+        operator.x().whileTrue(swerve.driveSysIdCmd());
+
+        operator.y().whileTrue(swerve.steerSysIdCmd());
     }
 
     public Swerve getSwerve(){

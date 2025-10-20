@@ -27,9 +27,9 @@ public class Superstructure extends SubsystemBase {
     private double stateStartTime = 0;
     private SuperstructureStates systemState = SuperstructureStates.IDLE;
 
-    LoggedTunableNumber coralIntakeVoltage = new LoggedTunableNumber("Superstructure/Coral Intake Voltage", 3);
-    LoggedTunableNumber coralIntakeCurrent = new LoggedTunableNumber("Superstructure/Coral Intake Current Limit", 25);
-    LoggedTunableNumber coralScoreVoltage = new LoggedTunableNumber("Superstructure/Coral Score Voltage", -3);
+    LoggedTunableNumber coralIntakeVoltage = new LoggedTunableNumber("Superstructure/Coral Intake Voltage", 4);
+    LoggedTunableNumber coralIntakeCurrent = new LoggedTunableNumber("Superstructure/Coral Intake Current Limit", 18.5);
+    LoggedTunableNumber coralScoreVoltage = new LoggedTunableNumber("Superstructure/Coral Score Voltage", 4);
 
     LoggedTunableNumber dealgaeVoltage = new LoggedTunableNumber("Superstructure/Algae Dealgae Voltage", 3);
     LoggedTunableNumber dealgaeCurrent = new LoggedTunableNumber("Superstructure/Algae Dealgae Current", 25);
@@ -51,10 +51,12 @@ public class Superstructure extends SubsystemBase {
     public enum SuperstructureStates{
         IDLE,
         ZERO,
-        ELEVATOR_DOWN,
+        ELEVATOR_DOWN, 
+        HOLD_POSITION,
         KICKSTAND,
         STATION_INTAKE_A,
         STATION_INTAKE_B,
+        STATION_INTAKE_C,
         GROUND_INTAKE_A,
         GROUND_INTAKE_B,
         SCORE_CORAL_A,
@@ -96,6 +98,12 @@ public class Superstructure extends SubsystemBase {
                 s_pivot.requestSetpoint(0);
                 s_wrist.requestSetpoint(0);
                 break;
+            case HOLD_POSITION:
+                s_elevator.requestZero();
+                s_endeffector.requestIdle();
+                s_pivot.requestHold();
+                s_wrist.requestHold();
+                break;
             case ELEVATOR_DOWN:
                 s_elevator.requestZero();
                 s_endeffector.requestIdle();
@@ -120,6 +128,13 @@ public class Superstructure extends SubsystemBase {
                 requestArmPosition(armPositionConstants.stationIntake);
                 s_endeffector.requestCoralIntake(coralIntakeVoltage.get());
                 if (s_endeffector.getCoralCurrent() > coralIntakeCurrent.get() && RobotController.getFPGATime() / 1.0E6 - stateStartTime > 0.5){
+                    setState(SuperstructureStates.STATION_INTAKE_C);
+                }
+                break;
+            case STATION_INTAKE_C:
+                requestArmPosition(armPositionConstants.stationIntake);
+                s_endeffector.requestIdle();
+                if(RobotController.getFPGATime() / 1.0E6 - stateStartTime > 5){
                     setState(SuperstructureStates.KICKSTAND);
                 }
                 break;
@@ -156,7 +171,7 @@ public class Superstructure extends SubsystemBase {
             case SCORE_CORAL_C:
                 requestArmPosition(getArmPosition());
                 s_endeffector.requestCoralOuttake(coralScoreVoltage.get());
-                if (RobotController.getFPGATime() / 1.0E6 - stateStartTime > 3){
+                if (RobotController.getFPGATime() / 1.0E6 - stateStartTime > 6){
                     setState(SuperstructureStates.ELEVATOR_DOWN);
                 }
                 break;
@@ -235,16 +250,16 @@ public class Superstructure extends SubsystemBase {
                 s_pivot.requestHold();
                 s_wrist.requestHold();
                 if (s_endeffector.getCoralCurrent() > coralIntakeCurrent.get() && RobotController.getFPGATime() / 1.0E6 - stateStartTime > 0.5){
-                    setState(SuperstructureStates.KICKSTAND);
+                    setState(SuperstructureStates.HOLD_POSITION);
                 }
                 break;
             case TEST_CORAL_SCORE:
-                s_elevator.requestZero();
+                s_elevator.requestSetpoint(elevatorPos.get());
                 s_endeffector.requestCoralOuttake(coralScoreVoltage.get());
                 s_pivot.requestHold();
                 s_wrist.requestHold();
-                if (RobotController.getFPGATime() / 1.0E6 - stateStartTime > 3){
-                    setState(SuperstructureStates.KICKSTAND);
+                if (RobotController.getFPGATime() / 1.0E6 - stateStartTime > 9){
+                    setState(SuperstructureStates.HOLD_POSITION);
                 }
                 break;
             case TEST_DEALGAE:
@@ -254,13 +269,13 @@ public class Superstructure extends SubsystemBase {
                 s_wrist.requestHold();
                 if (s_endeffector.getAlgaeCurrent() > dealgaeCurrent.get() && RobotController.getFPGATime() / 1.0E6 - stateStartTime > 0.5){
                     // s_endeffector.hasAlgae = true; // this is to be used for holding the algae
-                     setState(SuperstructureStates.KICKSTAND);
+                     setState(SuperstructureStates.HOLD_POSITION);
                 }
                 break;
             case ZERO_WRIST:
                 s_elevator.requestIdle();
                 s_endeffector.requestIdle();
-                s_pivot.requestIdle();
+                s_pivot.requestHold();
                 s_wrist.zeroSensor();
                 break;
             default:
