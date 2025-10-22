@@ -55,7 +55,7 @@ public class RobotContainer {
 
         driver.y().onTrue(new InstantCommand(() -> superstructure.requestZero()));
 
-        // driver.y().onTrue(new InstantCommand(() -> superstructure.requestGroundIntake()));
+        driver.leftBumper().onTrue(new InstantCommand(() -> superstructure.requestL4Coral()));
 
         // driver.leftBumper().onTrue(new InstantCommand(() -> superstructure.requestStationIntake()));
 

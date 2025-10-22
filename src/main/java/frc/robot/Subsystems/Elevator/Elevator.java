@@ -34,6 +34,9 @@ public class Elevator {
                 break;
             case ZERO:
                 elevatorIO.requestMotionMagic(0);
+                if(atSetpoint()){
+                    setState(ElevatorStates.IDLE);
+                }
                 break;
         }
     }

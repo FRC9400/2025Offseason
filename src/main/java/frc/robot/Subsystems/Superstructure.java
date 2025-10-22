@@ -29,7 +29,7 @@ public class Superstructure extends SubsystemBase {
 
     LoggedTunableNumber coralIntakeVoltage = new LoggedTunableNumber("Superstructure/Coral Intake Voltage", 4);
     LoggedTunableNumber coralIntakeCurrent = new LoggedTunableNumber("Superstructure/Coral Intake Current Limit", 18.5);
-    LoggedTunableNumber coralScoreVoltage = new LoggedTunableNumber("Superstructure/Coral Score Voltage", 4);
+    LoggedTunableNumber coralScoreVoltage = new LoggedTunableNumber("Superstructure/Coral Score Voltage", -4);
 
     LoggedTunableNumber dealgaeVoltage = new LoggedTunableNumber("Superstructure/Algae Dealgae Voltage", 3);
     LoggedTunableNumber dealgaeCurrent = new LoggedTunableNumber("Superstructure/Algae Dealgae Current", 25);
@@ -268,8 +268,8 @@ public class Superstructure extends SubsystemBase {
                 s_pivot.requestHold();
                 s_wrist.requestHold();
                 if (s_endeffector.getAlgaeCurrent() > dealgaeCurrent.get() && RobotController.getFPGATime() / 1.0E6 - stateStartTime > 0.5){
-                    // s_endeffector.hasAlgae = true; // this is to be used for holding the algae
-                     setState(SuperstructureStates.HOLD_POSITION);
+                    s_endeffector.hasAlgae = true; // this is to be used for holding the algae
+                    setState(SuperstructureStates.HOLD_POSITION);
                 }
                 break;
             case ZERO_WRIST:
