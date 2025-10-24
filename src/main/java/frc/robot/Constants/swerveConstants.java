@@ -13,7 +13,7 @@ public final class swerveConstants {
         public static final InvertedValue[] steerMotorInverts = {InvertedValue.Clockwise_Positive, InvertedValue.Clockwise_Positive, InvertedValue.Clockwise_Positive, InvertedValue.Clockwise_Positive};
         public static final SensorDirectionValue[] CANcoderInverts = {SensorDirectionValue.CounterClockwise_Positive, SensorDirectionValue.CounterClockwise_Positive, SensorDirectionValue.CounterClockwise_Positive, SensorDirectionValue.CounterClockwise_Positive};
         /* CANcoder Offset FL, FR, BL, BR */
-        public static final double[] CANcoderOffsets = {0.122559, 0.175293, -0.250732 , 0.083252};
+        public static final double[] CANcoderOffsets = {0.112305, 0.172607, -0.243164 , 0.173340};//0.122559, 0.175293, -0.250732 , 0.083252
      
         /* Gear Ratios */
         public static final double driveGearRatio = 6.12;
